@@ -176,6 +176,11 @@ on_pkgs_in_parallel {
 		push (@pkg_gencontrol_args, '-UMulti-Arch')
 			if (package_multiarch($package) eq 'no');
 
+		# mmc:
+		if ( exists $ENV{GITSHA}) {
+			push(@debug_info_params, "-Ddgit=$ENV{GITSHA}");
+		}
+
 		# Generate and install control file.
 		eval {
 			doit("dpkg-gencontrol", "-p$package", "-l$changelog", "-T$substvars",
