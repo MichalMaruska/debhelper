@@ -1,3 +1,13 @@
+debhelper (13.13-maruska) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * debhelper-documentation.json: The pam change happened in c14
+
+  [ Michal Maruska ]
+  * Put GITSHA into control file, as dgit.
+
+ -- Michal Maruska <mmaruska@gmail.com>  Tue, 30 Jan 2024 11:28:05 +0100
+
 debhelper (13.13) unstable; urgency=medium
 
   * Add `debhelper-documentation` `debputy` plugin. This provides
