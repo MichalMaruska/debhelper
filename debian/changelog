@@ -1,3 +1,9 @@
+debhelper (13.14.1-maruska) unstable; urgency=medium
+
+  * Put GITSHA into control file, as dgit.
+
+ -- Michal Maruska <mmaruska@gmail.com>  Sun, 25 Feb 2024 11:28:02 +0100
+
 debhelper (13.14.1) unstable; urgency=medium
 
   * dh_makeshlibs: Correct the auto-detected package name
