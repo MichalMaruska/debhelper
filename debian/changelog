@@ -1,3 +1,9 @@
+debhelper (13.15.2-maruska) unstable; urgency=medium
+
+  * Put GITSHA into control file, as dgit.
+
+ -- Michal Maruska <mmaruska@gmail.com>  Mon, 25 Mar 2024 00:56:33 +0100
+
 debhelper (13.15.2) unstable; urgency=medium
 
   * autopkgtest: Remove reference d/compat triggering perl tests
