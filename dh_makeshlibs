@@ -224,6 +224,19 @@ sub _all_so_files {
 	return if not -d $root_dir;
 	my (@all_so_files, @so_file_data);
 	my $objdump = cross_command($package, "objdump");
+	my $ma = package_multiarch($package);
+	my $ma_quoted = quotemeta($ma);
+	my $skip_dir_parent = qr{
+		/usr/lib(?:/${ma_quoted})?/?$
+	}x;
+	# Maybe this should be an allow list instead (#204975)
+	my $skip_dir_basename = qr{
+		  jni
+		| python(?:\d+[.][^/]++)?
+		| perl(?:5|-base)?
+		| ruby(?:gems-integration)?
+	}x;
+
 	require File::Find;
 	File::Find::find(sub {
 		# Lazy loading of File::Find makes perl think that File::Find::dir is only used once
@@ -231,6 +244,10 @@ sub _all_so_files {
 		no warnings qw(once);
 		# Only real/regular files
 		-l && return;
+		if ( -d and $File::Find::dir =~ $skip_dir_parent and $_ =~ $skip_dir_basename) {
+			$File::Find::prune = 1;
+			return;
+		}
 		-f _ || return;
 		my $path = "$File::Find::dir/$_";
 		return if excludefile($path);
@@ -446,6 +463,34 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# maintscripts for calling ldconfig.
 	if (! $dh{NOSCRIPTS} && $need_ldconfig) {
 		autotrigger($package, 'activate-noawait', 'ldconfig');
+	}
+
+	next if ! -f "$tmp/DEBIAN/symbols" and ! -f "$tmp/DEBIAN/shlibs";
+
+	my $t64_compat = Debian::Debhelper::Dh_Lib::t64_compat_name($package);
+	# Handle Provides: for the t64 transition
+	next if $t64_compat eq '' and $package !~ /^lib.*t64(?:-nss)?$/;
+	if ($t64_compat eq '') {
+		$t64_compat = $package;
+		$t64_compat =~ s/t64//;
+		if ($t64_compat eq $package) {
+			error("Failed to derive a t64 compat name for ${package}. Please file a bug against debhelper or add"
+				  . ' the X-Time64-Compat header to d/control, in which you can provide the compat package name'
+				  . ' you want.');
+		}
+	}
+
+	require Dpkg::Arch;
+	require Dpkg::BuildFlags;
+	my $arch = package_binary_arch($package);
+	my $bf = Dpkg::BuildFlags->new();
+	if (Dpkg::Arch::debarch_to_cpubits($arch) != 32 or !$bf->get_feature("abi", "time64")) {
+		addsubstvar($package, "t64:Provides", $t64_compat, '= ${binary:Version}');
+	} else {
+		# Avoid a "unknown" substvar from dpkg-gencontrol.
+		my $ext = pkgext($package);
+		my $substvars = "debian/${ext}substvars";
+		ensure_substvars_are_present($substvars, 't64:Provides');
 	}
 }
 

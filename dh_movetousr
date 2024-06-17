@@ -1,0 +1,230 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_movetousr - canonicalize location according to merged-/usr
+
+=cut
+
+use strict;
+use warnings;
+use Config;
+use File::Find;
+use File::Spec;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_movetousr> [S<I<debhelper options>>] [B<--fail-noop> | B<--warn-noop>]
+
+=head1 DESCRIPTION
+
+B<dh_movetousr> is a B<debhelper> program that canonicalizes paths inside packages according to merged-/usr.
+Shipping aliased paths is known to cause problems with B<dpkg>, so this helper moves all affected files to F</usr> regardless of how they were installed.
+The compatibility symlinks ensure that converted packages continue to work.
+In the process, absolute symbolic links may become relative or vice versa due to Debian policy section 10.5.
+
+Please keep in mind that moving files in this way is known to cause problems.
+Known problems have been documented at L<https://people.debian.org/~helmutg/dep17.html>.
+For instance, if files have been moved between packages, use of this tool may cause file loss during upgrades (P1).
+Most problems can be detected by L<https://salsa.debian.org/helmutg/dumat>, which uses the Debian bug tracking for feedback.
+Therefore, it is recommended to upload to B<experimental> when moving files (e.g. using this helper) or restructuring packages that earlier moved files.
+A particular problem not being detected is about B<dpkg-statoverride> (P5).
+Please review uses of B<dpkg-statoverride> in maintainer scripts and update them as needed.
+For these reasons, B<dh_movetousr> is not automatically enabled in e.g. a compatibility level.
+
+While we want to move files to F</usr> in B<trixie> and beyond, we do not want to move them in B<bookworm> and earlier.
+This poses challenges to backporting packages, because any such moves have to be reverted during the backport.
+A backport of B<debhelper> to B<bookworm> shall include a stub for this helper doing nothing to achieve this goal.
+For packages that do not need to be backported (e.g. packages targeting B<forky> and beyond), consider updating locations instead of using this helper.
+When the only affected type of file is B<systemd> units, consider using B<dh_installsystemd> or detecting the unit location from C<pkgconf --variable=systemdsystemunitdir systemd> instead of this helper as both will work in backports.
+
+For further information on the state of the transition refer to L<https://wiki.debian.org/UsrMerge>.
+
+B<dh_movetousr> shall be removed from B<debhelper> during B<forky+1> is release cycle.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--fail-noop>
+
+Fail if no files were found in aliased locations and therefore no change has
+been performed.
+
+=item B<--warn-noop>
+
+Warn if no files were found in aliased locations and therefore no change has
+been performed.
+
+=back
+
+=head1 EXAMPLES
+
+  Build-Depends: dh-sequence-movetousr
+
+Enable this tool in a package that uses B<dh>.
+
+=cut
+
+init(options => {
+	'fail-noop!' => sub { $dh{NOOP_LEVEL} = 'error'; },
+	'warn-noop!' => sub { $dh{NOOP_LEVEL} = 'warning'; },
+});
+
+my @merged_directories = (
+	qw{bin lib lib64 libo32 libx32 sbin},
+);
+my $merged_dir_pattern = join('|', @merged_directories);
+
+sub merge_entry {
+	my ($package, $rootdir, $location) = @_;
+	if (-l "$rootdir/usr/$location") {
+		error("cannot move $location to /usr in $package, because it exists there as a symlink");
+	} elsif (-l "$rootdir/$location") {
+		if (-e "$rootdir/usr/$location") {
+			error("cannot move symlink $location to /usr in $package, because it already exists there");
+		}
+		my $target = readlink("$rootdir/$location");
+		my $recreate = 0;  # Whether the link target should be recomputed.
+		my @newtarget;  # Represented as split m|/|. Relative to /.
+		if ($target !~ m,^/,) {
+			# In case the original target is relative, prepend the
+			# basename of the link location.
+			@newtarget = split(m|/+|, $location);
+			pop @newtarget;
+		}
+		# Append the original target, resolving any '../', './' and
+		# double-slashes.
+		foreach my $part (split(m|/+|, $target)) {
+			if ($part eq '..') {
+				# If the link goes past /, recreate.
+				$recreate = 1 if (scalar @newtarget <= 1);
+				pop @newtarget if (scalar @newtarget > 0);
+			} elsif ($part ne '' && $part ne '.') {
+				push @newtarget, $part;
+			}
+		}
+		if (grep { $_ eq $newtarget[0] } @merged_directories) {
+			# If the link target is aliased, unalias and recreate.
+			unshift @newtarget, 'usr';
+			$recreate = 1;
+		} elsif ($target =~ m,^/, && $newtarget[0] eq 'usr') {
+			# If the original link is absolute and now points to
+			# /usr, recreate.
+			$recreate = 1;
+		}
+		if ($recreate) {
+			make_symlink("usr/$location", join('/', @newtarget), $rootdir);
+			rm_files("$rootdir/$location");
+		} else {
+			rename_path("$rootdir/$location", "$rootdir/usr/$location");
+		}
+	} elsif (-d "$rootdir/$location") {
+		my $did_mkdir = 0;
+		if (! -d "$rootdir/usr/$location") {
+			if (-e "$rootdir/usr/$location") {
+				error("cannot move directory $location to /usr in $package as it exists in /usr as a non-directory");
+			} else {
+				install_dir("$rootdir/usr/$location");
+				$did_mkdir = 1;
+			}
+		}
+		opendir(my $dh, "$rootdir/$location") or
+			error("cannot open directory $rootdir/$location: $!");
+		while (my $entry = readdir($dh)) {
+			next if ($entry eq "." || $entry eq "..");
+			merge_entry($package, $rootdir, "$location/$entry");
+		}
+		closedir($dh);
+		if ($did_mkdir) {
+			doit("chown", "--reference", "$rootdir/$location", "$rootdir/usr/$location");
+			doit("chmod", "--reference", "$rootdir/$location", "$rootdir/usr/$location");
+		}
+		verbose_print('rmdir ' . escape_shell("$rootdir/$location"))
+			if $dh{VERBOSE};
+		rmdir("$rootdir/$location") or
+			error("rmdir $rootdir/$location failed: $!");
+	} elsif (-e "$rootdir/usr/$location") {
+		error("cannot move $location to /usr in $package, because it already exists there");
+	} else {
+		rename_path("$rootdir/$location", "$rootdir/usr/$location");
+	}
+}
+
+my ($is_noop) = 1;
+sub process_packages {
+	foreach my $package (@_) {
+		my $tmp = tmpdir($package);
+
+		next if ! -d $tmp;
+
+		if (-d "$tmp/usr") {
+			# Reconstruct absolute symlinks pointing from /usr into an
+			# aliased directory.
+			find (
+				{
+					wanted => sub {
+						return unless -l;
+						my $target = readlink($_);
+						return unless ($target =~ m,^/($merged_dir_pattern)(/|$),);
+						s|^\Q$tmp\E||;
+						make_symlink("$_", "usr/$target", $tmp);
+					},
+					no_chdir => 1
+				},
+				"$tmp/usr"
+			);
+		}
+
+		foreach my $dir (@merged_directories) {
+			if (-d "$tmp/$dir" && ! -l "$tmp/$dir") {
+				merge_entry($package, $tmp, $dir);
+				$is_noop = 0;
+			}
+		}
+	}
+}
+
+if (exists $ENV{'DEB_BUILD_PROFILES'} || ! exists $dh{NOOP_LEVEL}) {
+	on_pkgs_in_parallel(\&process_packages);
+} else {
+	process_packages(@{$dh{DOPACKAGES}});
+	if ($is_noop) {
+		warning('dh_movetousr did not move any files to /usr');
+		if (exists $ENV{DH_INTERNAL_MOVETOUSR_IS_ADDON}) {
+			if ($dh{DOARCH} && ! $dh{DOINDEP} && getpackages('indep')) {
+				warning('consider moving dh-sequence-movetousr to Build-Depends-Indep');
+			} elsif ($dh{DOINDEP} && ! $dh{DOARCH} && getpackages('arch')) {
+				warning('consider moving dh-sequence-movetousr to Build-Depends-Arch');
+			} else {
+				warning('consider dropping dh-sequence-movetousr from Build-Depends');
+			}
+		} else {
+			if ($dh{DOARCH} && ! $dh{DOINDEP} && getpackages('indep')) {
+				warning('consider passing -i to dh_movetousr');
+			} elsif ($dh{DOINDEP} && ! $dh{DOARCH} && getpackages('arch')) {
+				warning('consider passing -a to dh_movetousr');
+			} else {
+				warning('consider deleting the dh_movetousr invocation');
+			}
+		}
+		if ($dh{NOOP_LEVEL} eq 'error') {
+			error('failing as requested');
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Helmut Grohne <helmut@subdivi.de>
+
+=cut

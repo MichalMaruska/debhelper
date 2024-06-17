@@ -6,7 +6,7 @@
 
 package Debian::Debhelper::Dh_Lib;
 
-use v5.24;
+use v5.28;
 use warnings;
 use utf8;
 
@@ -14,6 +14,7 @@ use utf8;
 # Debian#971362 comes around.
 no feature 'unicode_strings';
 
+use Errno qw(ENOENT);
 
 use constant {
 	# Lowest compat level supported
@@ -122,9 +123,11 @@ qw(
 	package_binary_arch
 	package_declared_arch
 	package_multiarch
+	package_is_essential
 	package_section
 	package_arch
 	package_type
+	package_field
 	process_pkg
 	compute_doc_main_package
 	isnative
@@ -165,6 +168,7 @@ qw(
 	autotrigger
 	addsubstvar
 	delsubstvar
+	ensure_substvars_are_present
 
 	generated_file
 	restore_file_on_clean
@@ -244,6 +248,8 @@ our $DEB822_FIELD_REGEX = qr/
     /xoa;
 
 our $PARSE_DH_SEQUENCE_INFO = 0;
+# Safety valve for `dh_assistant`. Not intended for anyone else.
+our $ALLOW_UNSAFE_EXECUTION = 1;
 
 # We need logging in compat 9 or in override/hook targets (for --remaining-packages to work)
 # - This option is a global toggle to disable logs for special commands (e.g. dh or dh_clean)
@@ -732,23 +738,14 @@ sub rename_path {
 
 sub reset_perm_and_owner {
 	my ($mode, @paths) = @_;
-	my $_mode;
 	my $use_root = should_use_root();
-	# Dark goat blood to tell 0755 from "0755"
-	if (length( do { no warnings "numeric"; $mode & "" } ) ) {
-		# 0755, leave it alone.
-		$_mode = $mode;
-	} else {
-		# "0755" -> convert to 0755
-		$_mode = oct($mode);
-	}
 	if ($dh{VERBOSE}) {
-		verbose_print(sprintf('chmod %#o -- %s', $_mode, escape_shell(@paths)));
+		verbose_print(sprintf('chmod %#o -- %s', $mode, escape_shell(@paths)));
 		verbose_print(sprintf('chown 0:0 -- %s', escape_shell(@paths))) if $use_root;
 	}
 	return if $dh{NO_ACT};
 	for my $path (@paths) {
-		chmod($_mode, $path) or error(sprintf('chmod(%#o, %s): %s', $mode, $path, $!));
+		chmod($mode, $path) or error(sprintf('chmod(%#o, %s): %s', $mode, $path, $!));
 		if ($use_root) {
 			chown(0, 0, $path) or error("chown(0, 0, $path): $!");
 		}
@@ -849,12 +846,12 @@ sub _color {
 		# Support NO_COLOR (https://no-color.org/)
 		$mode //= exists($ENV{'NO_COLOR'}) ? 'never' : 'auto';
 
+		# Initialize with no color, so we are guaranteed to only do this once.
+		$_use_color = 0;
 		if ($mode eq 'auto') {
 			$_use_color = 1 if -t *STDOUT or -t *STDERR;
 		} elsif ($mode eq 'always') {
 			$_use_color = 1;
-		} else {
-			$_use_color = 0;
 		}
 
 		eval {
@@ -908,7 +905,7 @@ sub dirname {
 
 # Pass in a number, will return true iff the current compatibility level
 # is less than or equal to that number.
-my $compat_from_bd;
+my ($compat_from_bd, $compat_from_dctrl);
 {
 	my $check_pending_removals = get_buildoption('dherroron', '') eq 'obsolete-compat-levels' ? 1 : 0;
 	my $warned_compat = $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} ? 1 : 0;
@@ -920,6 +917,7 @@ my $compat_from_bd;
 	sub resetcompat {
 		undef $c;
 		undef $compat_from_bd;
+		undef $compat_from_dctrl;
 	}
 
 	sub _load_compat_info {
@@ -934,7 +932,6 @@ my $compat_from_bd;
 			close($compat_in);
 			if (! defined $l || ! length $l) {
 				error("debian/compat must contain a positive number (found an empty first line)");
-
 			}
 			else {
 				chomp $l;
@@ -944,23 +941,41 @@ my $compat_from_bd;
 				if ($new_compat !~ m/^\d+$/) {
 					error("debian/compat must contain a positive number (found: \"${new_compat}\")");
 				}
-				if (defined($compat_from_bd) and $compat_from_bd != -1) {
+				if ($compat_from_bd != -1 or $compat_from_dctrl != -1) {
 					warning("Please specify the debhelper compat level exactly once.");
 					warning(" * debian/compat requests compat ${new_compat}.");
-					warning(" * debian/control requests compat ${compat_from_bd} via \"debhelper-compat (= ${compat_from_bd})\"");
+					warning(" * debian/control requests compat ${compat_from_bd} via \"debhelper-compat (= ${compat_from_bd})\"")
+						if $compat_from_bd > -1;
+					warning(" * debian/control requests compat ${compat_from_dctrl} via \"X-DH-Compat: ${compat_from_dctrl}\"")
+						if $compat_from_dctrl > -1;
 					warning();
-					warning("Hint: If you just added a build-dependency on debhelper-compat, then please remember to remove debian/compat");
+					warning("Hint: If you just added a build-dependency on debhelper-compat, then please remember to remove debian/compat")
+						if $compat_from_bd > -1;
+					warning("Hint: If you just added a X-DH-Compat field, then please remember to remove debian/compat")
+						if $compat_from_dctrl > -1;
 					warning();
-					error("debhelper compat level specified both in debian/compat and via build-dependency on debhelper-compat");
+					error("debhelper compat level specified both in debian/compat and in debian/control");
 				}
 				$c = $new_compat;
+			}
+			if ($c >= 15 or (HIGHEST_STABLE_COMPAT_LEVEL//0) > 13) {
+				error("Sorry, debian/compat is no longer a supported source for the debhelper compat level."
+				 . " Please add a Build-Depends on `debhelper-compat (= C)` or add `X-DH-Compat: C` to the source stanza"
+				 . " of d/control and remove debian/compat.");
+			}
+			if ($c >= 13 and not $nowarn) {
+				warning("Use of debian/compat is deprecated and will be removed in debhelper (>= 14~).")
 			}
 			$delared_compat_source = 'debian/compat';
 		} elsif ($compat_from_bd != -1) {
 			$c = $compat_from_bd;
 			$delared_compat_source = "Build-Depends: debhelper-compat (= $c)";
+		} elsif ($compat_from_dctrl != -1) {
+			$c = $compat_from_dctrl;
+			$delared_compat_source = "X-DH-Compat: $c";
 		} elsif (not $nowarn) {
-			error("Please specify the compatibility level in debian/compat or via Build-Depends: debhelper-compat (= X)");
+			# d/compat deliberately omitted since we do not want to recommend users to it.
+			error("Please specify the compatibility level in debian/control. Such as, via Build-Depends: debhelper-compat (= X)");
 		}
 
 		$declared_compat = int($c);
@@ -1039,19 +1054,21 @@ sub default_sourcedir {
 #   * debian/package.filename.hostarch
 #   * debian/package.filename.hostos
 #   * debian/package.filename
-#   * debian/filename (if the package is the main package)
+#   * debian/filename (if the package is the main package and compat < 15)
 # If --name was specified then the files
 # must have the name after the package name:
 #   * debian/package.name.filename.hostarch
 #   * debian/package.name.filename.hostos
 #   * debian/package.name.filename
-#   * debian/name.filename (if the package is the main package)
+#   * debian/name.filename (if the package is the main package and compat < 15)
 
 {
 	my %_check_expensive;
 
 	sub pkgfile {
-		my ($package, $filename) = @_;
+		# NB: $nameless_variant_handling is an implementation-detail; third-party packages
+		# should not rely on it.
+		my ($package, $filename, $nameless_variant_handling) = @_;
 		my (@try, $check_expensive);
 
 		if (not exists($_check_expensive{$filename})) {
@@ -1106,8 +1123,23 @@ sub default_sourcedir {
 					);
 			}
 			push(@try, "debian/$package.$filename");
-			if ($package eq $dh{MAINPACKAGE}) {
-				push @try, "debian/$filename";
+			my $nameless_variant = "debian/$filename";
+			if (defined $dh{NAME} and not compat(13) and -f $nameless_variant) {
+				warning('The use of prefix-less debhelper config files with --name is deprecated.');
+				warning("Please rename \"${nameless_variant}\" to \"debian/$dh{MAINPACKAGE}.${filename}\"");
+				error("Named prefix-less debhelper config files is not supported in compat 15 and later")
+					if not compat(14);
+				warning('Named prefix-less debhelper config files will trigger an error in compat 15 or later');
+			}
+			if ($nameless_variant_handling or (not defined($nameless_variant_handling) and $package eq $dh{MAINPACKAGE})) {
+				push(@try, $nameless_variant);
+				if (getpackages() > 1 and not $nameless_variant_handling and not compat(13) and -f $nameless_variant) {
+					warning('The use of prefix-less debhelper config files is deprecated.');
+					warning("Please rename \"${nameless_variant}\" to \"debian/$dh{MAINPACKAGE}.${filename}\"");
+					error("Prefix-less debhelper config files is not supported in compat 15 and later")
+						if not compat(14);
+					warning('Prefix-less debhelper config files will trigger an error in compat 15 or later');
+				}
 			}
 		}
 		foreach my $file (@try) {
@@ -1157,7 +1189,7 @@ sub isnative {
 	}
 
 	# Make sure we look at the correct changelog.
-	my $isnative_changelog = pkgfile($package,"changelog");
+	my $isnative_changelog = pkgfile($package, 'changelog', 0);
 	if (! $isnative_changelog) {
 		$isnative_changelog = "debian/changelog";
 		$cache_key = '_source';
@@ -1472,6 +1504,33 @@ sub addsubstvar {
 	return _update_substvar($substvarfile, $update_logic, $insert_logic);
 }
 
+sub ensure_substvars_are_present {
+	my ($file, @substvars) = @_;
+	my (%vars, $fd);
+	return 1 if $dh{NO_ACT};
+	if (open($fd, '+<', $file)) {
+		while (my $line = <$fd>) {
+			my $k;
+			($k, undef) = split(m/=/, $line, 2);
+			$vars{$k} = 1 if $k;
+		}
+		# Fall-through and append the missing vars if any.
+	} else {
+		error("open(${file}) failed: $!") if $! != ENOENT;
+		open($fd, '>', $file) or error("open(${file}) failed: $!");
+	}
+
+	for my $var (@substvars) {
+		if (not exists($vars{$var})) {
+			verbose_print("echo ${var}= >> ${file}");
+			print ${fd} "${var}=\n";
+			$vars{$var} = 1;
+		}
+	}
+	close($fd) or error("close(${file}) failed: $!");
+	return 1;
+}
+
 sub _glob_expand_error_default_msg {
 	my ($pattern, $dir_ref) = @_;
 	my $dir_list = join(', ', map { escape_shell($_) } @{$dir_ref});
@@ -1772,14 +1831,12 @@ sub samearch {
 #
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
-my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
-    %package_sections, $sourcepackage, %package_cross_type, %dh_bd_sequences);
+my (%packages_by_type, $sourcepackage, %dh_bd_sequences, %package_fields);
 
 # Resets the arrays; used mostly for testing
 sub resetpackages {
 	undef $sourcepackage;
-	%package_types = %package_arches = %package_multiarches =
-	    %packages_by_type = %package_sections = %package_cross_type = ();
+	%package_fields = %packages_by_type = ();
 	%dh_bd_sequences = ();
 }
 
@@ -1836,6 +1893,9 @@ sub _parse_debian_control {
 			# Continuation line
 			s/^\s[.]?//;
 			push(@{$bd_field_value}, $_) if $bd_field_value;
+			error('X-DH-Compat should not need to span multiple lines')
+				if ($field_name and $field_name eq 'x-dh-compat');
+
 			# Ensure it is not completely empty or the code below will assume the paragraph ended
 			$_ = '.' if not $_;
 		} elsif (not $_ and not %seen_fields) {
@@ -1870,11 +1930,15 @@ sub _parse_debian_control {
 			} elsif ($field_name =~ /^(?:build-depends(?:-arch|-indep)?)$/) {
 				$bd_field_value = [$value];
 				$bd_fields{$field_name} = $bd_field_value;
+			} elsif ($field_name eq 'x-dh-compat') {
+				error('The X-DH-Compat field must contain a single integer') if ($value !~ m/^\d+$/);
+				$compat_from_dctrl = int($value);
 			}
 		}
 		last if not $_ or eof;
 	}
 	error("could not find Source: line in control file.") if not defined($sourcepackage);
+	$compat_from_dctrl //= -1;
 	if (%bd_fields) {
 		my ($dh_compat_bd, $final_level);
 		my %field2addon_type = (
@@ -1948,6 +2012,12 @@ sub _parse_debian_control {
 	} else {
 		$compat_from_bd = -1;
 	}
+
+	error(
+		'The X-DH-Compat field cannot be used together with a Build-Dependency on debhelper-compat.'
+			. ' Please remove one of the two.'
+	) if ($compat_from_bd > -1 and $compat_from_dctrl > -1);
+
 
 	%seen_fields = ();
 	$field_name = undef;
@@ -2029,11 +2099,14 @@ sub _parse_debian_control {
 					error("Unknown value of X-DH-Build-For-Type \"$cross_type\" for package $package");
 				}
 
-				$package_types{$package} = _strip_spaces($field_values{'package-type'} // 'deb');
-				$package_arches{$package} = $arch;
-				$package_multiarches{$package} = _strip_spaces($field_values{'multi-arch'} // '');
-				$package_sections{$package} = _strip_spaces($field_values{'section'} // $source_section);
-				$package_cross_type{$package} = $cross_type;
+				$field_values{'package-type'} = _strip_spaces($field_values{'package-type'} // 'deb');
+				$field_values{'architecture'} = $arch;
+				$field_values{'multi-arch'} = _strip_spaces($field_values{'multi-arch'} // '');
+				$field_values{'section'} = _strip_spaces($field_values{'section'} // $source_section);
+				$field_values{'x-dh-build-for-type'} = $cross_type;
+				$field_values{'x-time64-compat'} = _strip_spaces($field_values{'x-time64-compat'} // '');
+				my %fields = %field_values;
+				$package_fields{$package} = \%fields;
 				push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
 
 				if (defined($build_profiles)) {
@@ -2132,11 +2205,11 @@ sub package_arch {
 sub package_binary_arch {
 	my $package=shift;
 
-	if (! exists $package_arches{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return hostarch();
 	}
-	return 'all' if $package_arches{$package} eq 'all';
+	return 'all' if $package_fields{$package}{'architecture'} eq 'all';
 	return dpkg_architecture_value('DEB_TARGET_ARCH') if package_cross_type($package) eq 'target';
 	return hostarch();
 }
@@ -2145,22 +2218,22 @@ sub package_binary_arch {
 sub package_declared_arch {
 	my $package=shift;
 
-	if (! exists $package_arches{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return hostarch();
 	}
-	return $package_arches{$package};
+	return $package_fields{$package}{'architecture'};
 }
 
 # Returns whether the package specified Architecture: all
 sub package_is_arch_all {
 	my $package=shift;
 
-	if (! exists $package_arches{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return hostarch();
 	}
-	return $package_arches{$package} eq 'all';
+	return $package_fields{$package}{'architecture'} eq 'all';
 }
 
 # Returns the multiarch value of a package.
@@ -2169,13 +2242,38 @@ sub package_multiarch {
 
 	# Test the architecture field instead, as it is common for a
 	# package to not have a multi-arch value.
-	if (! exists $package_arches{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		# The only sane default
 		return 'no';
 	}
-	return $package_multiarches{$package} // 'no';
+	return $package_fields{$package}{'multi-arch'} // 'no';
 }
+
+sub package_is_essential {
+	my ($package) = @_;
+
+	# Test the architecture field instead, as it is common for a
+	# package to not have a multi-arch value.
+	if (! exists($package_fields{$package})) {
+		warning "package $package is not in control info";
+		# The only sane default
+		return 0;
+	}
+	my $essential = $package_fields{$package}{'essential'} // 'no';
+	return $essential eq 'yes';
+}
+
+sub package_field {
+	my ($package, $field, $default_value) = @_;
+		if (! exists($package_fields{$package})) {
+		warning "package $package is not in control info";
+		return $default_value;
+	}
+	return $package_fields{$package}{$field} if exists($package_fields{$package}{$field});
+	return $default_value;
+}
+
 
 # Returns the (raw) section value of a package (possibly including component).
 sub package_section {
@@ -2183,11 +2281,11 @@ sub package_section {
 
 	# Test the architecture field instead, as it is common for a
 	# package to not have a multi-arch value.
-	if (! exists $package_sections{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return 'unknown';
 	}
-	return $package_sections{$package} // 'unknown';
+	return $package_fields{$package}{'section'} // 'unknown';
 }
 
 sub package_cross_type {
@@ -2195,21 +2293,31 @@ sub package_cross_type {
 
 	# Test the architecture field instead, as it is common for a
 	# package to not have a multi-arch value.
-	if (! exists $package_cross_type{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return 'host';
 	}
-	return $package_cross_type{$package} // 'host';
+	return $package_fields{$package}{'x-dh-build-for-type'} // 'host';
 }
 
 sub package_type {
 	my ($package) = @_;
 
-	if (! exists $package_types{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return DEFAULT_PACKAGE_TYPE;
 	}
-	return $package_types{$package};
+	return $package_fields{$package}{'package-type'};
+}
+
+sub t64_compat_name {
+	my ($package) = @_;
+
+	if (! exists($package_fields{$package})) {
+		warning "package $package is not in control info";
+		return '';
+	}
+	return $package_fields{$package}{'x-time64-compat'};
 }
 
 # Return true if a given package is really a udeb.
@@ -2326,7 +2434,7 @@ sub debhelper_script_subst {
 			close($in_fd);
 			close($out_fd) or error("close($tmp/DEBIAN/$script) failed: $!");
 		}
-		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
+		reset_perm_and_owner(0755, "$tmp/DEBIAN/$script");
 	}
 	elsif (@generated_scripts) {
 		if ($dh{VERBOSE}) {
@@ -2347,7 +2455,7 @@ sub debhelper_script_subst {
 			}
 			close($out_fd) or error("close($tmp/DEBIAN/$script) failed: $!");
 		}
-		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
+		reset_perm_and_owner(0755, "$tmp/DEBIAN/$script");
 	}
 }
 
@@ -2755,7 +2863,7 @@ sub restore_file_on_clean {
 	}
 	$file =~ s{^\./}{}g;
 	$file =~ s{//++}{}g;
-	if ($file =~ m{^\.} or $file =~ m{/CVS/} or $file =~ m{/\.svn/}) {
+	if ($file =~ m{^\.} or $file =~ m{/CVS/} or $file =~ m{/\.}) {
 		# We do not want to smash a Vcs repository by accident.
 		warning("Attempt to store $file, which looks like a VCS file or");
 		warning("a hidden package file (like quilt's \".pc\" directory)");
@@ -3044,11 +3152,11 @@ sub compute_doc_main_package {
 	# under its own package name.
 	return $doc_package if $target_package !~ s/-doc$//;
 	# FOO-doc hosts the docs for FOO; seems reasonable
-	return $target_package if exists($package_types{$target_package});
+	return $target_package if exists($package_fields{$target_package});
 	if ($doc_package =~ m/^lib./) {
 		# Special case, "libFOO-doc" can host docs for "libFOO-dev"
 		my $lib_dev = "${target_package}-dev";
-		return $lib_dev if exists($package_types{$lib_dev});
+		return $lib_dev if exists($package_fields{$lib_dev});
 		# Technically, we could go look for a libFOO<something>-dev,
 		# but atm. it is presumed to be that much of a corner case
 		# that it warrents an override.
@@ -3091,6 +3199,85 @@ sub assert_opt_is_known_package {
 }
 
 
+sub dh_gencontrol_automatic_substvars {
+	my ($package, $substvars_file, $has_dbgsym) = @_;
+	return if not -f $substvars_file;
+
+	require Dpkg::Control;
+	require Dpkg::Control::Fields;
+	open(my $sfd, '+<', $substvars_file) or error("open $substvars_file: $!");
+	my @dep_fields = Dpkg::Control::Fields::field_list_pkg_dep();
+	my %known_dep_fields = map { lc($_) => 1 } @dep_fields;
+	my (%field_vars, $needs_dbgsym);
+	while (my $line = <$sfd>) {
+		next if $line =~ m{^\s*(?:[#].*)?$};
+		chomp($line);
+		next if $line !~ m{(\w[-:0-9A-Za-z]*)([?!\$]?=)(?:.*)};
+		my $key = $1;
+		my $assignment = $2;
+		# Ignore `$=` because they will work without us doing anything (which in turn means
+		# we might not have to rewrite the file).
+		if ($assignment eq '$=') {
+			$needs_dbgsym = 1;
+			next;
+		}
+		# If there is "required" substvar, then it will not be used for the dbgsym.
+		$needs_dbgsym = 1 if $assignment eq '!=';
+		next if ($key !~ m/:([-0-9A-Za-z]+)$/);
+		my $field_name_lc = lc($1);
+		next if not exists($known_dep_fields{$field_name_lc});
+		my $substvar = '${' . $key . '}';
+		push(@{$field_vars{$field_name_lc}}, $substvar);
+	}
+	close($sfd);
+	return if not %field_vars and not $needs_dbgsym;
+
+	open(my $ocfd, '<', 'debian/control') or error("open debian/control: $!");
+	my $src_stanza = Dpkg::Control->new;
+	my $pkg_stanza;
+	$src_stanza->parse($ocfd, 'debian/control') or error("No source stanza!?");
+	while (1) {
+		$pkg_stanza = Dpkg::Control->new;
+		$pkg_stanza->parse($ocfd, 'debian/control') // error("EOF before the ${package} stanza appeared!?");
+		last if $pkg_stanza->{'Package'} eq $package;
+	}
+	close($ocfd);
+
+	my $rewritten_dctrl = generated_file($package, "rewritten-dctrl");
+	for my $field_name (@dep_fields) {
+		my $field_name_lc = lc($field_name);
+		# No merging required
+		next if not exists($field_vars{$field_name_lc});
+		my $field_value = $pkg_stanza->{$field_name};
+		my $merge_value = join(", ", @{$field_vars{$field_name_lc}});
+		if (defined($field_value) and $field_value !~ m{^\s*+$}) {
+			$field_value =~ s/,\s*$//;
+			$field_value .= ", ";
+			$field_value .= $merge_value;
+		} else {
+			$field_value = $merge_value;
+		}
+		$pkg_stanza->{$field_name} = $field_value;
+	}
+	open(my $wfd, '>', $rewritten_dctrl) or error("open ${rewritten_dctrl}: $!");
+	$src_stanza->output($wfd);
+	print {$wfd} "\n";
+	$pkg_stanza->output($wfd);
+	if ($has_dbgsym) {
+		my $dbgsym_stanza = Dpkg::Control->new;
+		# Minimal stanza to avoid substvars warnings. Most fields are still set
+		# via -D.
+		$dbgsym_stanza->{'Package'} = "${package}-dbgsym";
+		$dbgsym_stanza->{'Architecture'} = $pkg_stanza->{"Architecture"};
+		$dbgsym_stanza->{'Description'} = "debug symbols for ${package}";
+		print {$wfd} "\n";
+		$dbgsym_stanza->output($wfd);
+	}
+	close($wfd) or error("Failed to close/flush ${rewritten_dctrl}: $!");
+	return ($rewritten_dctrl, $has_dbgsym);
+}
+
+
 sub _internal_optional_file_args {
 	state $_disable_file_seccomp;
 	if (not defined($_disable_file_seccomp)) {
@@ -3106,6 +3293,12 @@ sub _internal_optional_file_args {
 	}
 	return('--no-sandbox') if $_disable_file_seccomp;
 	return;
+}
+
+sub assert_unsafe_execution_is_ok {
+	if (not $Debian::Debhelper::Dh_Lib::ALLOW_UNSAFE_EXECUTION) {
+		error("Internal error: The command did not want to allow unsafe execution, but was about to trigger it!");
+	}
 }
 
 1
