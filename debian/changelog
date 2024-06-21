@@ -1,3 +1,13 @@
+debhelper (13.16-maruska) unstable; urgency=medium
+
+  [ Américo Monteiro ]
+  * Update on Portuguese translation of man pages
+
+  [ Michal Maruska ]
+  * Put GITSHA into control file, as dgit.
+
+ -- Michal Maruska <mmaruska@gmail.com>  Fri, 21 Jun 2024 08:33:15 +0200
+
 debhelper (13.16) unstable; urgency=medium
 
   [ Niels Thykier ]
