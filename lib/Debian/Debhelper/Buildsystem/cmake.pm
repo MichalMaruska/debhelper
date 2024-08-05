@@ -79,9 +79,15 @@ sub new {
 	return $this;
 }
 
+sub _get_pkgconf {
+	my $toolprefix = is_cross_compiling() ? dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-" : "";
+	return "/usr/bin/" . $toolprefix . "pkg-config";
+}
+
 sub _get_cmake_env {
 	my $update_env = {};
 	$update_env->{DEB_PYTHON_INSTALL_LAYOUT} = 'deb' unless $ENV{DEB_PYTHON_INSTALL_LAYOUT};
+	$update_env->{PKG_CONFIG} = _get_pkgconf() unless $ENV{PKG_CONFIG};
 	return $update_env;
 }
 
@@ -129,8 +135,8 @@ sub configure {
 		if (not $ENV{CXX}) {
 			push @flags, "-DCMAKE_CXX_COMPILER=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-g++";
 		}
-		push(@flags, "-DPKG_CONFIG_EXECUTABLE=/usr/bin/" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-pkg-config");
-		push(@flags, "-DPKGCONFIG_EXECUTABLE=/usr/bin/" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-pkg-config");
+		push(@flags, "-DPKG_CONFIG_EXECUTABLE=" . _get_pkgconf());
+		push(@flags, "-DPKGCONFIG_EXECUTABLE=" . _get_pkgconf());
 		push(@flags, "-DQMAKE_EXECUTABLE=/usr/bin/" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-qmake");
 	}
 	push(@flags, "-DCMAKE_INSTALL_LIBDIR=lib/" . dpkg_architecture_value("DEB_HOST_MULTIARCH"));
