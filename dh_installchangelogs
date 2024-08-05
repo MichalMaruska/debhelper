@@ -306,8 +306,24 @@ on_pkgs_in_parallel {
 		next if is_udeb($package);
 	
 		my $tmp=tmpdir($package);
-		my $changelog = pkgfile($package, 'changelog', 1);
-		my $news = pkgfile($package, 'NEWS', 1);
+		my $changelog = pkgfile(
+			{
+				'internal-nameless-variant-handling' => 1,
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			'changelog',
+		);
+		my $news = pkgfile(
+			{
+				'internal-nameless-variant-handling' => 1,
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			'NEWS',
+		);
 		my $upstream_changelog;
 		my ($upstream_changelog_text, $upstream_changelog_html);
 		my $changelog_from_tmp_dir = 0;

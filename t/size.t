@@ -21,12 +21,12 @@ foreach my $file (@progs) {
 	while (<$fd>) {
 		$cutting=1 if /^=/;
 		$cutting=0 if /^=cut/;
-		next if $cutting || /^(?:=|\s*(?:\#.*|[}]\s*)?$)/;
+		next if $cutting || /^(?:=|\s*(?:\#.*|[{}]\s*)?$)/;
 		$lines++;
 		$maxlength=length($_) if length($_) > $maxlength;
 	}
 	close($fd);
 	print "# $file has $lines lines, max length is $maxlength\n";
-	ok($lines < 200, $file);
-	ok($maxlength < 160, $file);
+	ok($lines < 200, $file) or diag("lines: ${lines}");
+	ok($maxlength < 160, $file) or diag("maxlength: ${maxlength}");
 }

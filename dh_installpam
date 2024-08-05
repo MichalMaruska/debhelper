@@ -55,7 +55,7 @@ init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $pam=pkgfile($package,"pam");
+	my $pam = pkgfile({'named' => 1}, $package, "pam");
 
 	my $pamd_dir="/usr/lib/pam.d";
 	if (compat(13)) {

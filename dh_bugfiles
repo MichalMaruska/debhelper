@@ -87,7 +87,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# package in question
 	my %bugfiles=();
 	while (my ($type, $pkgfilename) = each(%bugfile_types)) {
-		my $file=pkgfile($package,$pkgfilename);
+		my $file = pkgfile(
+			{
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			$pkgfilename,
+		);
 		if ($file) {
 			$bugfiles{$type}=$file;
 		}

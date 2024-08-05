@@ -93,7 +93,14 @@ my $nodocs = is_build_profile_active('nodoc') || get_buildoption('nodoc') ? 1 : 
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $file=pkgfile($package,"wm");
+	my $file = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"wm",
+	);
 
 	my @wm;
 	if ($file) {

@@ -59,8 +59,22 @@ init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $menu=pkgfile($package,"menu");
-	my $menu_method=pkgfile($package,"menu-method");
+	my $menu = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"menu",
+	);
+	my $menu_method = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"menu-method",
+	);
 	
 	if ($menu ne '') {
 		install_dir("$tmp/usr/share/menu");

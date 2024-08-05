@@ -63,7 +63,7 @@ if (not compat(13)) {
 }
 
 # The `substvars` file ius not quite a pkgfile, but it works similar enough that people might
-# be surprised if it was bit detected.
+# be surprised if it was not detected.
 # INTROSPECTABLE: CONFIG-FILES pkgfile(substvars)
 
 on_pkgs_in_parallel {
@@ -75,7 +75,15 @@ on_pkgs_in_parallel {
 
 		my $substvars="debian/${ext}substvars";
 
-		my $changelog=pkgfile($package, 'changelog', 1);
+		my $changelog = pkgfile(
+			{
+				'internal-nameless-variant-handling' => 1,
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			'changelog',
+		);
 
 		install_dir("$tmp/DEBIAN");
 

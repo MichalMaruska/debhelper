@@ -209,7 +209,7 @@ The following keys are also set in the `%dh` hash when you call `init()`:
   is less than or equal to that number, it will return true.
   Looks at `DH_COMPAT` to get the compatibility level.
 
-- `pkgfile($package, $basename)`
+- `pkgfile([$opts,] $package, $basename)`
 
   Pass this command the name of a binary package, and the base name of a
   file, and it will return the actual filename to use. This is used
@@ -219,6 +219,23 @@ The following keys are also set in the `%dh` hash when you call `init()`:
   `debian/package.filename`, and (until compat 15) `debian/filename`
   is also allowable for the `$dh{MAINPACKAGE}`. If the file does not
   exist, nothing is returned.
+
+  Since debhelper/13.17, if the first argument is a hashref, it is taken
+  to be configuration parameter (`$opts`). This hashref can have the
+  following keys:
+
+    * `named`: If set to a truth value, the `pkgfile` can have a `name`
+      segment. This is only useful if it ever makes sense to have multiple
+      files for the same package. This ties to the `--name` parameter
+      for the lookup though `--name` can still be used when this is set
+      to `false`. The default is `false` at compat 14+ and `true` for
+      earlier compat levels.
+
+    * `support-architecture-restriction`: When set to a truth value,
+      the `pkgfile` can have an architecture restriction. The is only
+      useful if the contents can reasonably be architecture specific.
+      The default is `false` at compat 14+ and `true` for earlier
+      compat levels.
 
   If the *entire* behavior of a command, when run without any special
   options, is determined by the existence of 1 or more pkgfiles,

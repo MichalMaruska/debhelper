@@ -77,7 +77,14 @@ $dh{NAME} = undef;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp = tmpdir($package);
-	my $alternatives = pkgfile($package, 'alternatives');
+	my $alternatives = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		'alternatives',
+	);
 
 	if (-f $alternatives) {
 		_parse_alternatives_file_and_generate_maintscripts($package, $tmp, $alternatives);

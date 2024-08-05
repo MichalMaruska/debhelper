@@ -9,3 +9,6 @@ indent_style = space
 
 [*.{pl,pm}]
 indent_style = tab
+
+[dh_*]
+indent_style = tab

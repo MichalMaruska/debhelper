@@ -85,7 +85,14 @@ on_pkgs_in_parallel {
 	foreach my $package (@_) {
 		my $tmp=tmpdir($package);
 
-		my $compress=pkgfile($package,"compress");
+		my $compress = pkgfile(
+			{
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			"compress",
+		);
 
 		# Run the file name gathering commands from within the directory
 		# structure that will be effected.

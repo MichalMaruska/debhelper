@@ -90,7 +90,14 @@ sub find_kernel_modules {
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $modprobe_file=pkgfile($package,"modprobe");
+	my $modprobe_file = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"modprobe",
+	);
 
 	if ($modprobe_file) {
 		my $path = '/etc/modprobe.d/' . pkgfilename($package) . '.conf';

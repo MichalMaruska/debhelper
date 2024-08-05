@@ -63,7 +63,14 @@ init();
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	foreach my $type (qw{hourly daily weekly monthly yearly}) {
-		my $cron=pkgfile($package,"cron.$type");
+		my $cron=pkgfile(
+			{
+				'named'                              => 1,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			"cron.$type",
+		);
 		if ($cron) {
 			install_dir("$tmp/etc/cron.$type");
 			install_prog($cron,"$tmp/etc/cron.$type/".pkgfilename($package));

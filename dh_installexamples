@@ -126,7 +126,14 @@ foreach my $package (getpackages()) {
 	next if is_udeb($package);
 
 	my $tmp=tmpdir($package);
-	my $file=pkgfile($package,"examples");
+	my $file = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"examples",
+	);
 	my @search_dirs = ('.');
 	my $skip_install = process_pkg($package) ? 0 : 1;
 	my $error_handler = $skip_install ? \&glob_expand_error_handler_silently_ignore : $default_error_handler;

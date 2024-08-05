@@ -208,6 +208,7 @@ Generates a shlibs file that looks something like:
 =cut
 
 my ($shlibs_udeb, %known_udeb_solibs);
+my %PKGFILE_OPTS = ( 'named' => 0, 'support-architecture-restriction'  => 1);
 
 init(options => {
 	"m=s", => \$dh{M_PARAMS},
@@ -295,7 +296,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# each other, we need to make these local.
 	my $v_flag_set = $dh{V_FLAG_SET};
 	my $v_flag = $dh{V_FLAG} // '';
-	my $shlibs_file = pkgfile($package, 'shlibs');
+	my $shlibs_file = pkgfile(\%PKGFILE_OPTS, $package, 'shlibs');
 
 	rm_files("$tmp/DEBIAN/shlibs");
 
@@ -431,7 +432,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# dpkg-gensymbols files
-	my $symbols=pkgfile($package, "symbols");
+	my $symbols = pkgfile(\%PKGFILE_OPTS, $package, "symbols");
 	if (-e $symbols) {
 		my @liblist;
 		if (! compat(7)) {

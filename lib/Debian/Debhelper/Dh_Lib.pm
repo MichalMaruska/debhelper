@@ -1068,7 +1068,46 @@ sub default_sourcedir {
 	sub pkgfile {
 		# NB: $nameless_variant_handling is an implementation-detail; third-party packages
 		# should not rely on it.
-		my ($package, $filename, $nameless_variant_handling) = @_;
+		my ($opts, $package, $filename);
+		my ($nameless_variant_handling, $named, $support_architecture_restriction, $is_bulk_check);
+
+		# !!NOT A PART OF THE PUBLIC API!!
+		# Bulk test used by dh to speed up the can_skip check.   It
+		# is NOT useful for finding the most precise pkgfile.
+
+		if (ref($_[0]) eq 'HASH') {
+			($opts, $package, $filename) = @_;
+			$is_bulk_check = ref($package) eq 'ARRAY';
+			if ($is_bulk_check) {
+				# If `dh` does not have declarative hints to go by, then it must assume all
+				# variants are possible
+				$named = 1;
+				$support_architecture_restriction = 1;
+			}
+
+			$nameless_variant_handling = $opts->{'internal-nameless-variant-handling'}
+				if exists($opts->{'internal-nameless-variant-handling'});
+			$named = $opts->{'named'} if exists($opts->{'named'});
+			$support_architecture_restriction = $opts->{'support-architecture-restriction'}
+				if exists($opts->{'support-architecture-restriction'});
+		} else {
+			($package, $filename) = @_;
+
+			$is_bulk_check = ref($package) eq 'ARRAY';
+			if ($is_bulk_check) {
+				# If `dh` does not have declarative hints to go by, then it must assume all
+				# variants are possible
+				$named = 1;
+				$support_architecture_restriction = 1;
+			}
+		}
+
+		if (compat(13)) {
+			# Before compat 14, these were unconditionally on.
+			$named = 1;
+			$support_architecture_restriction = 1;
+		}
+
 		my (@try, $check_expensive);
 
 		if (not exists($_check_expensive{$filename})) {
@@ -1093,11 +1132,11 @@ sub default_sourcedir {
 		# globally or not.  But if someone is being "clever" then the
 		# cache is reusable and for the general/normal case, it has no
 		# adverse effects.
-		if (defined $dh{NAME}) {
+		if (defined $dh{NAME} and $opts->{'named'}) {
 			$filename="$dh{NAME}.$filename";
 		}
 
-		if (ref($package) eq 'ARRAY') {
+		if ($is_bulk_check) {
 			# !!NOT A PART OF THE PUBLIC API!!
 			# Bulk test used by dh to speed up the can_skip check.   It
 			# is NOT useful for finding the most precise pkgfile.
@@ -1115,7 +1154,7 @@ sub default_sourcedir {
 		} else {
 			# Avoid checking for hostarch+hostos unless we have reason
 			# to believe that they exist.
-			if ($check_expensive) {
+			if ($check_expensive and $opts->{'support-architecture-restriction'}) {
 				my $cross_type = uc(package_cross_type($package));
 				push(@try,
 					 "debian/${package}.${filename}.".dpkg_architecture_value("DEB_${cross_type}_ARCH"),
@@ -1189,7 +1228,17 @@ sub isnative {
 	}
 
 	# Make sure we look at the correct changelog.
-	my $isnative_changelog = pkgfile($package, 'changelog', 0);
+	local $dh{NAME};
+	delete($dh{NAME});
+	my $isnative_changelog = pkgfile(
+		{
+			'internal-nameless-variant-handling' => 0,
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		'changelog',
+	);
 	if (! $isnative_changelog) {
 		$isnative_changelog = "debian/changelog";
 		$cache_key = '_source';
@@ -2402,7 +2451,14 @@ sub debhelper_script_subst {
 
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
-	my $file=pkgfile($package,$script);
+	my $file = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		$script,
+	);
 	my %variables = defined($extra_vars) ? %{$extra_vars} : ();
 	my $service_script = generated_file($package, "${script}.service", 0);
 	my @generated_scripts = ("debian/$ext$script.debhelper", $service_script);

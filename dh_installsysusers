@@ -69,10 +69,10 @@ init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
-	my $sysusers = pkgfile($package,"sysusers");
+	my $sysusers = pkgfile({'named' => 1}, $package, "sysusers");
 	my $sysusers_targetdir = "${tmpdir}/usr/lib/sysusers.d";
 	my $target = $dh{NAME} // $package;
-	my $typoed_name = pkgfile($package, "sysuser");
+	my $typoed_name = pkgfile({'named' => 1}, $package, "sysuser");
 
 	if ($sysusers eq '' and $typoed_name ne '') {
 		# Warn people in case they typo this as much as I did.

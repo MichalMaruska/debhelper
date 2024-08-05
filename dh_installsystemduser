@@ -114,7 +114,7 @@ sub contains_install_section {
 
 sub install_user_unit {
 	my ($package, $name, $suffix, $path) = @_;
-	my $unit = pkgfile($package, "user.$suffix");
+	my $unit = pkgfile({'named' => 1}, $package, "user.$suffix");
 	return if $unit eq '';
 
 	install_dir($path);

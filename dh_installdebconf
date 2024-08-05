@@ -191,8 +191,22 @@ if (defined($dh{U_PARAMS})) {
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $config=pkgfile($package,"config");
-	my $templates=pkgfile($package,"templates");
+	my $config = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"config",
+	);
+	my $templates = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"templates",
+	);
 
 	install_dir("$tmp/DEBIAN");
 

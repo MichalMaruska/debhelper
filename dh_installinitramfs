@@ -71,7 +71,14 @@ init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp = tmpdir($package);
-	my $hook_script = pkgfile($package, 'initramfs-hook');
+	my $hook_script = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		'initramfs-hook',
+	);
 	my $has_hooks;
 	my $hook_dir = "${tmp}/usr/share/initramfs-tools/hooks";
 

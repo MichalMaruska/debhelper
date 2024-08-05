@@ -97,10 +97,38 @@ if (! defined $dh{FLAVOR}) {
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
-	my $emacsen_compat=pkgfile($package,"emacsen-compat");
-	my $emacsen_install=pkgfile($package,"emacsen-install");
-	my $emacsen_remove=pkgfile($package,"emacsen-remove");
-	my $emacsen_startup=pkgfile($package,"emacsen-startup");
+	my $emacsen_compat = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"emacsen-compat",
+	);
+	my $emacsen_install = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"emacsen-install",
+	);
+	my $emacsen_remove = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"emacsen-remove",
+	);
+	my $emacsen_startup = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"emacsen-startup",
+	);
 
 	if ($emacsen_compat ne '') {
 		install_dir("$tmp/usr/lib/emacsen-common/packages/compat");

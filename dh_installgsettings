@@ -71,7 +71,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my $gsettings_schemas_dir = "$tmp/usr/share/glib-2.0/schemas/";
 
-	my $override = pkgfile($package,"gsettings-override");
+	my $override = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"gsettings-override"
+	);
 	if ($override ne '') {
 		install_dir($gsettings_schemas_dir);
 		install_file($override,

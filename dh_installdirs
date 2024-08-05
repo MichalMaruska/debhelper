@@ -88,7 +88,14 @@ init(options => {
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $file=pkgfile($package,"dirs");
+	my $file = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"dirs",
+	);
 	my $srcdir = $dh{SOURCEDIR} // default_sourcedir($package);
 
 	install_dir($tmp) if compat(10);

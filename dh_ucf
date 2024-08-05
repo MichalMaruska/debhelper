@@ -73,7 +73,14 @@ init();
 # PROMISE: DH NOOP WITHOUT ucf cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $file=pkgfile($package,"ucf");
+	my $file = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"ucf",
+	);
 
 	my @ucf;
 	if ($file) {

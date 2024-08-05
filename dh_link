@@ -113,7 +113,14 @@ init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $file=pkgfile($package,"links");
+	my $file = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"links",
+	);
 
 	my @links;
 	if ($file) {

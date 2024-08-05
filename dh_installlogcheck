@@ -68,7 +68,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
                              violations.d violations.ignore.d}) {
 		my $typenod=$type;
 		$typenod=~s/\.d//;
-		my $logcheck=pkgfile($package,"logcheck.$typenod");
+		my $logcheck = pkgfile(
+			{
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			"logcheck.$typenod",
+		);
 		if ($logcheck) {
 			my $packagenodot=pkgfilename($package); # run-parts..
 			$packagenodot=~s/\./_/g;

@@ -247,7 +247,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# For udebs, only do the postinst, and no #DEBHELPER#.
 		# Udebs also support menutest and isinstallable scripts.
 		foreach my $script (qw{postinst menutest isinstallable}) {
-			my $f=pkgfile($package,$script);
+			my $f = pkgfile(
+				{
+					'named'                              => 0,
+					'support-architecture-restriction'   => 0,
+				},
+				$package,
+				$script,
+			);
 			if ($f) {
 				install_prog($f, "$tmp/DEBIAN/$script");
 			}
@@ -257,7 +264,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		next;
 	}
 	
-	my $maintscriptfile=pkgfile($package, "maintscript");
+	my $maintscriptfile = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"maintscript",
+	);
 	my @special_conffiles_entries;
 	if ($maintscriptfile) {
 		if (compat(9)) {
@@ -320,13 +334,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Install non-executable files
-	my @non_exec_files;
-	# Removed in compat 12.
-	push(@non_exec_files, 'conffiles');
+	my @non_exec_files = qw(conffiles);
 	# In compat 10, we let dh_makeshlibs handle "shlibs".
 	push(@non_exec_files, 'shlibs') if compat(9);
 	foreach my $file (@non_exec_files) {
-		my $f=pkgfile($package,$file);
+		my $f = pkgfile(
+			{
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			$file,
+		);
 		if ($f) {
 			install_file($f, "$tmp/DEBIAN/$file");
 		}
@@ -360,7 +379,14 @@ sub install_triggers {
 	my ($package, $tmp) = @_;
 	my $generated = generated_file($package, 'triggers', 0);
 	my @sources = grep { -f $_ } (
-		pkgfile($package, 'triggers'),
+		pkgfile(
+			{
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			'triggers'
+		),
 		$generated,
 	);
 	my $target = "$tmp/DEBIAN/triggers";

@@ -84,9 +84,9 @@ sub uniq {
 # Install package maintainer supplied tmpfiles files
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
-	my $tmpfile = pkgfile($package, 'tmpfiles');
+	my $tmpfile = pkgfile({'named' => 1}, $package, 'tmpfiles');
 	my $name = $dh{NAME} // $package;
-	my $old_tmpfile = pkgfile($package, 'tmpfile');
+	my $old_tmpfile = pkgfile({'named' => 1}, $package, 'tmpfile');
 	my $dir;
 	if (not $tmpfile) {
 		my $new_name;

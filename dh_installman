@@ -160,7 +160,14 @@ on_items_in_parallel(\@all_packages, sub {
 		next if is_udeb($package);
 
 		my $tmp = tmpdir($package);
-		my $file = pkgfile($package, "manpages");
+		my $file = pkgfile(
+			{
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			"manpages",
+		);
 		my @manpages;
 		my @search_dirs = ('.');
 		my $skip_install = process_pkg($package) ? 0 : 1;

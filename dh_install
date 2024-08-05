@@ -159,7 +159,16 @@ foreach my $package (getpackages()) {
 	my $skip_install = process_pkg($package) ? 0 : 1;
 
 	my $tmp=tmpdir($package);
-	my $file=pkgfile($package,"install");
+	my $file = pkgfile(
+		{
+			'named'                              => 0,
+			# At least, `util-linux` uses `dh-exec` with a `... > debian/foo.install.amd64` as
+			# a work around.
+			'support-architecture-restriction'   => 1,
+		},
+		$package,
+		"install",
+	);
 
 	my @install;
 	if ($file) {

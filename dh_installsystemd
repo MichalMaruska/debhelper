@@ -212,7 +212,7 @@ sub has_sysv_equivalent {
 sub install_unit {
 	my ($package, $script, $pkgsuffix, $path, $installsuffix) = @_;
 	$installsuffix = $installsuffix || $pkgsuffix;
-	my $unit = pkgfile($package, $pkgsuffix);
+	my $unit = pkgfile({'named' => 1}, $package, $pkgsuffix);
 	return if $unit eq '';
 	install_dir($path);
 	install_file($unit, "${path}/${script}.${installsuffix}");

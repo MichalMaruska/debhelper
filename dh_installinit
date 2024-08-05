@@ -274,7 +274,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}       
 
 	my $service='';
-	$service=pkgfile($package,"service") if compat(10);
+	$service=pkgfile({'named' => 1}, $package, "service") if compat(10);
 	if ($service ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/usr/lib/systemd/system";
 		install_dir($path);
@@ -282,14 +282,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	my $tmpfile='';
-	$tmpfile=pkgfile($package,"tmpfile") if compat(10);
+	$tmpfile=pkgfile({'named' => 1}, $package,"tmpfile") if compat(10);
 	if ($tmpfile ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/usr/lib/tmpfiles.d";
 		install_dir($path);
 		install_file($tmpfile, "$path/$script.conf");
 	}
 
-	my $job=pkgfile($package,"upstart");
+	my $job=pkgfile({'named' => 1}, $package,"upstart");
 	if ($job ne '' and not compat(11)) {
 		isnative($package); # For the side-effect of setting $dh{VERSION}
 		warning("Detected an upstart file; these are no longer supported by dh_installinit in compat 11");
@@ -306,14 +306,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		install_file($job, "$tmp/etc/init/$jobfile.conf");
 	}
 
-	my $default=pkgfile($package,'default');
+	my $default=pkgfile({'named' => 1}, $package,'default');
 	if ($default ne '' && ! $dh{ONLYSCRIPTS}) {
 		install_dir("$tmp/etc/default");
 		install_file($default, "$tmp/etc/default/$script");
 	}
 
-	my $init=pkgfile($package,$scriptsrc) || pkgfile($package,"init") ||
-		pkgfile($package,"init.d");
+	my $init=pkgfile({'named' => 1}, $package,$scriptsrc) || pkgfile({'named' => 1}, $package,"init") ||
+		pkgfile({'named' => 1}, $package,"init.d");
 
 	if ($init ne '' && ! $dh{ONLYSCRIPTS}) {
 		install_dir("$tmp/etc/init.d");

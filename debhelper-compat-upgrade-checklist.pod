@@ -244,6 +244,12 @@ will not have to do anything for this migration.
 
 =item -
 
+The debhelper configuration files are subject to the following changes:
+
+=over 4
+
+=item -
+
 It now triggers a warning to use package-less versions of debhelper configuration
 files when there are 2 or more binary packages listed in F<debian/control> in
 most cases.  Legacy files should be renamed to F<< debian/I<package>.foo >>
@@ -269,6 +275,21 @@ if you had a F<debian/bar.service> with the following snippet in F<debian/rules>
 Then you need to rename F<debian/bar.service> to F<debian/foo.bar.service>.
 
 In compat 15 (or later), this is changed to an error.
+
+=item -
+
+The default look up rules for B<Dh_Lib> based tools now assumes that configuration
+files are no longer named (B<--name>) nor support architecture restrictions by default.
+If you work with a third-party debhelper-like tool and need support for either of these
+features, please file a bug against the tool asking it to declare its configuration
+file with the relevant options in its B<pkgfile> call.
+
+Note that B<debhelper> itself tweaked its rules for most of its tools as well based on
+analysis of usage via B<codesearch.debian.org>. Should you be relying on a feature like
+architecture restrictions for a given config file that is no longer supported, please
+file a feature request for the use-case and it might be restored.
+
+=back
 
 =item -
 

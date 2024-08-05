@@ -80,7 +80,14 @@ $default_error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
 
 foreach my $package (getpackages()) {
 	my $tmp=tmpdir($package);
-	my $file=pkgfile($package,"info");
+	my $file = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"info",
+	);
 	my @search_dirs = ('.');
 	my @ignored_files;
 	my $skip_install = process_pkg($package) ? 0 : 1;

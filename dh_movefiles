@@ -84,7 +84,14 @@ my $ret=0;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $files=pkgfile($package,"files");
+	my $files=pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"files",
+	);
 
 	my $sourcedir="debian/tmp";
 	if ($dh{SOURCEDIR}) {

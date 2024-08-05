@@ -260,7 +260,14 @@ foreach my $package (getpackages()) {
 	next if is_udeb($package);
 	
 	my $tmp=tmpdir($package);
-	my $file=pkgfile($package,"docs");
+	my $file=pkgfile(
+		{
+			'named'                            => 0,
+			'support-architecture-restriction' => 0,
+		},
+		$package,
+		"docs",
+	);
 	my $link_doc=($dh{LINK_DOC} && $dh{LINK_DOC} ne $package);
 	my $skip_install = process_pkg($package) ? 0 : 1;
 	my @search_dirs = ('.');
@@ -351,9 +358,25 @@ foreach my $package (getpackages()) {
 	}
 
 	# .Debian is correct, according to policy, but I'm easy.
-	my $readme_debian=pkgfile($package,'README.Debian', $package eq $dh{MAINPACKAGE} ? 1 : 0);
+	my $readme_debian = pkgfile(
+		{
+			'internal-nameless-variant-handling' => $package eq $dh{MAINPACKAGE} ? 1 : 0,
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		'README.Debian',
+	);
 	if (! $readme_debian) {
-		$readme_debian=pkgfile($package,'README.debian', $package eq $dh{MAINPACKAGE} ? 1 : 0);
+		$readme_debian = pkgfile(
+			{
+				'internal-nameless-variant-handling' => $package eq $dh{MAINPACKAGE} ? 1 : 0,
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			'README.debian',
+		);
 	}
 	if (! $link_doc && $readme_debian && ! excludefile($readme_debian)) {
 		ensure_docdir($package);
@@ -361,7 +384,15 @@ foreach my $package (getpackages()) {
 					 "$tmp/usr/share/doc/$package/README.Debian");
 	}
 
-	my $todo=pkgfile($package, 'TODO', $package eq $dh{MAINPACKAGE} ? 1 : 0);
+	my $todo = pkgfile(
+		{
+			'internal-nameless-variant-handling' => $package eq $dh{MAINPACKAGE} ? 1 : 0,
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		'TODO',
+	);
 	if (! $link_doc && $todo && ! excludefile($todo)) {
 		ensure_docdir($package);
 		if (isnative($package)) {
@@ -380,7 +411,15 @@ foreach my $package (getpackages()) {
 		# Support debian/package.copyright, but if not present, fall
 		# back on debian/copyright for all packages, not just the 
 		# main binary package.
-		my $copyright = pkgfile($package, 'copyright', 1);
+		my $copyright = pkgfile(
+			{
+				'internal-nameless-variant-handling' => 1,
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+		    },
+			$package,
+			'copyright',
+		);
 		if ($copyright && ! excludefile($copyright)) {
 			ensure_docdir($package);
 			install_file($copyright,

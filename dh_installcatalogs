@@ -78,7 +78,14 @@ init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
-	my $sgmlcatlistfile = pkgfile($package, "sgmlcatalogs");
+	my $sgmlcatlistfile = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"sgmlcatalogs",
+	);
 	my @sgmlinstalled; # catalogs we've installed
 	if ($#ARGV >= 0) {
 		error("extra command-line arguments");

@@ -82,7 +82,7 @@ if ($dh{PRIORITY}) {
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $rules_file=pkgfile($package,"udev");
+	my $rules_file = pkgfile({'named' => 1}, $package, "udev");
 	my $filename=basename($rules_file);
 	if ($filename eq 'udev') {
 		$filename = "$package.udev";

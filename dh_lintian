@@ -49,7 +49,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my $tmp=tmpdir($package);
 	my $or_dir = "$tmp/usr/share/lintian/overrides";
-	my $overrides=pkgfile($package,"lintian-overrides");
+	my $overrides = pkgfile(
+		{
+			'named'                              => 0,
+			'support-architecture-restriction'   => 0,
+		},
+		$package,
+		"lintian-overrides"
+	);
 
 	if ($overrides ne '') {
 		install_dir($or_dir);
