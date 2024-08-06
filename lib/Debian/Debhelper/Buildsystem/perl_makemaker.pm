@@ -32,6 +32,12 @@ sub check_auto_buildable {
 	return 0;
 }
 
+sub _get_pkgconf {
+	my $toolprefix = is_cross_compiling() ? dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-" : "";
+	return "/usr/bin/" . $toolprefix . "pkg-config";
+}
+
+
 sub new {
 	my $class=shift;
 	my $this=$class->SUPER::new(@_);
@@ -66,6 +72,7 @@ sub configure {
 			if is_cross_compiling() and defined $cross_flag;
 		push @flags, "LD=$ld $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
+	$ENV{"PKG_CONFIG"} = _get_pkgconf() if not exists($ENV{"PKG_CONFIG"});
 
 	push(@perl_flags, '-I.') if compat(10);
 
