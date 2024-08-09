@@ -29,7 +29,7 @@ if the environment variable is set). If there is a F<setup.py> or F<Build.PL>,
 it is used. Note that the Ant build system does not support installation,
 so B<dh_auto_install> will not install files built using Ant.
 
-In compat 15 or later, B<dh_auto_install> will use F<debian/tmp> as the default
+In compat 14 or later, B<dh_auto_install> will use F<debian/tmp> as the default
 B<--destdir> and should be moved from there to the appropriate package build
 directory using L<dh_install(1)> or similar tools. Though if the B<single-binary>
 addon for L<dh(1)> is activated, then it will pass an explicit
@@ -82,7 +82,7 @@ buildsystems_init(options => {
 # If destdir is not specified, determine it automatically
 if (!$destdir) {
 	my @allpackages=getpackages();
-	if (@allpackages > 1 or not compat(14)) {
+	if (@allpackages > 1 or not compat(13)) {
 		$destdir="debian/tmp";
 	}
 	else {

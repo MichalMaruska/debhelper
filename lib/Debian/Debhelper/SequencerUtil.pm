@@ -447,10 +447,11 @@ sub compute_selected_addons {
 	if (compat(14, 1) && getpackages() == 1 && !exists($explicitly_managed{'single-binary'})) {
 		if (not compat(13, 1)) {
 			warning("Implicitly activating single-binary dh addon for backwards compatibility.  In compat 14+,");
-			warning("this fallback will *not* happen automatically and dh_auto_install will instead use a");
-			warning("different default for --destdir, which can cause the source to produce an empty binary package");
+			warning("this fallback will *not* happen automatically via dh_auto_install will instead use a");
+			warning("different default for --destdir unless the single-binary add-on is active,");
+			warning("which can cause the source to produce an empty binary package");
 			warning();
-			warning('To keep the existing behaviour, please activate the single-binary addon explicitly.');
+			warning('To keep the existing behaviour (compat 13), please activate the single-binary addon explicitly.');
 			warning('This can be done by adding "dh-sequence-single-binary" to Build-Depends or passing');
 			warning('--with=single-binary to dh.');
 			warning();

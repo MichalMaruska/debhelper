@@ -32,17 +32,15 @@ Changes from v14 are:
 
 =item -
 
-The B<dh_auto_install> tool no longer defaults to B<< --destdir=debian/I<package> >>
-for source packages only producing a single binary.  If this behaviour is wanted,
-the package should explicitly activate the B<single-binary> dh addon (e.g., by adding
-B<dh-sequence-single-binary> to B<Build-Depends>) or pass B<--destdir> to
-B<dh_auto_install>.
+The B<single-binary> add-on for B<dh> is no longer implicitly activated by
+source packages that have a single B<Package> stanza in F<debian/control>. If
+the package needs the short-cuts for single-binary packages, it must explicitly
+activate the B<single-binary> add-in.
 
-The rationale for this change is to avoid "surprises" when adding a second binary package
-later.  Previously, debhelper would silently change behaviour often resulting in empty
-binary packages being uploaded to the archive by mistake. With the new behaviour,
-the B<single-binary> addon will detect the mismatch and warn the maintainer of what is
-about to happen.
+This can be done via a B<Build-Depends> on B<dh-sequence-single-binary>.
+
+Any B<--without single-binary> passed to B<dh> to avoid the warning in compat 14
+can now be removed to simplify F<debian/rules> without triggering the warning.
 
 =item -
 
@@ -141,8 +139,18 @@ B<dh_installinitramfs> in the default B<dh> sequence.
 
 I<< This item only applies to source packages that have exactly one B<Package> stanza in F<debian/control>. >>
 
+The B<dh_auto_install> command now unconditionally uses B<--destdir=debian/tmp> by default. The special-case
+for source packages building a single binary package is now moved to B<single-binary> B<dh> addon. Note, this
+add-on is activated by default in compat 14 but not in compat 15 (see next bullet item).
+
+=item -
+
+I<< This item only applies to source packages that have exactly one B<Package> stanza in F<debian/control>. >>
+
 The B<dh> sequencer will warn if the B<single-binary> addon is implicitly activated to
-warn maintainers of the pending compat 15 change in B<dh_auto_install>.
+warn maintainers of the pending compat 15 change in B<dh_auto_install>. The implicit
+activation is a transitional feature to reduce the changes of risks with this change.
+In compat 15, the implicit activation will no longer trigger.
 
 Maintainers are urged to either explicitly activate the B<single-binary> addon to
 preserve the existing behaviour (e.g., by adding B<dh-sequence-single-binary> to
