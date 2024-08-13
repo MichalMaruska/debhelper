@@ -1,3 +1,35 @@
+debhelper (13.17) unstable; urgency=medium
+
+  [ Américo Monteiro ]
+  * Update on Portuguese translation of man pages
+
+  [ Niels Thykier ]
+  * Reorder default sequence around dh_fixperms and nearby tools in
+    compat 14. (Closes: #981783, #982457). This should also avoid
+    future issues like LP#1928381 where Ubuntu's modifications to
+    `dh_strip` cause differences not visible in Debian.
+  * dh_assistant: Fix bug the config introspection could be wrong.
+  * debhelper-documentation.json: Associate with `substvars` with
+    `dh_gencontrol`.
+  * Add some config hints to `dh_makeshlibs` and `dh_gencontrol`.
+  * Bump Standards-Version to 4.7.0 - no changes required
+  * Dh_Lib.pm: Change `pkgfile` lookup to have opt-in features
+    rather than always-on in compat 14. Third-party debhelper tools
+    should update their `pkgfile` calls if they need `named` or/and
+    architecture specifc configuration files.
+  * Set PKG_CONFIG when calling Makefile.pl (makemaker) if not already set
+  * Make `dh_auto_install --destdir` change a pure compat 14 change.
+    Thanks to Jeremy Bícha <jeremy.bicha@canonical.com>.
+    (Closes: #1074322)
+
+  [ Jean-Pierre Giraud ]
+  * Update French manpage translation
+
+  [ Helmut Grohne ]
+  * cmake.pm: Also pass pkg-config via environment (Closes: #1077673)
+
+ -- Niels Thykier <niels@thykier.net>  Tue, 13 Aug 2024 12:21:03 +0000
+
 debhelper (13.16) unstable; urgency=medium
 
   [ Niels Thykier ]
