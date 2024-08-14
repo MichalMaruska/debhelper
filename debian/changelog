@@ -1,3 +1,13 @@
+debhelper (13.17-maruska) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * debhelper (13.16) unstable; urgency=medium
+
+  [ Michal Maruska ]
+  * Put GITSHA into control file, as dgit.
+
+ -- Michal Maruska <mmaruska@gmail.com>  Wed, 14 Aug 2024 07:06:58 +0200
+
 debhelper (13.17) unstable; urgency=medium
 
   [ Américo Monteiro ]
