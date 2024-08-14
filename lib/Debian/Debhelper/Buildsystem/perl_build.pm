@@ -8,12 +8,17 @@ package Debian::Debhelper::Buildsystem::perl_build;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(compat is_cross_compiling perl_cross_incdir warning);
+use Debian::Debhelper::Dh_Lib qw(compat is_cross_compiling perl_cross_incdir warning dpkg_architecture_value);
 use parent qw(Debian::Debhelper::Buildsystem);
 use Config;
 
 sub DESCRIPTION {
 	"Perl Module::Build (Build.PL)"
+}
+
+sub _get_pkgconf {
+	my $toolprefix = is_cross_compiling() ? dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-" : "";
+	return "/usr/bin/" . $toolprefix . "pkg-config";
 }
 
 sub check_auto_buildable {
@@ -58,6 +63,7 @@ sub configure {
 	if ($ENV{CFLAGS} && ! compat(8)) {
 		push @flags, "--config", "optimize=$ENV{CFLAGS} $ENV{CPPFLAGS}";
 	}
+	$ENV{"PKG_CONFIG"} = _get_pkgconf() if not exists($ENV{"PKG_CONFIG"});
 	if ($ENV{LDFLAGS} && ! compat(8)) {
 		my $ld = $Config{ld};
 		if (is_cross_compiling()) {
