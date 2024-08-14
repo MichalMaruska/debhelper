@@ -1,3 +1,12 @@
+debhelper (13.18) unstable; urgency=medium
+
+  * perl_makemaker: Fix missing import that broke cross-builds.
+    Thanks to Helmut Grohne <helmut@subdivi.de> (Closes: #1078707)
+  * perl-build: Set PKG_CONFIG during cross builds like perl-makemaker.
+    Thanks to gregor herrmann <gregoa@debian.org>
+
+ -- Niels Thykier <niels@thykier.net>  Wed, 14 Aug 2024 20:27:05 +0000
+
 debhelper (13.17) unstable; urgency=medium
 
   [ Américo Monteiro ]
