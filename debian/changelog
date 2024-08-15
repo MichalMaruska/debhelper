@@ -1,3 +1,9 @@
+debhelper (13.18-maruska) unstable; urgency=medium
+
+  * Put GITSHA into control file, as dgit.
+
+ -- Michal Maruska <mmaruska@gmail.com>  Thu, 15 Aug 2024 09:34:23 +0200
+
 debhelper (13.18) unstable; urgency=medium
 
   * perl_makemaker: Fix missing import that broke cross-builds.
