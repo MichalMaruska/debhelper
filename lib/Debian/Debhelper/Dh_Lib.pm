@@ -1132,7 +1132,7 @@ sub default_sourcedir {
 		# globally or not.  But if someone is being "clever" then the
 		# cache is reusable and for the general/normal case, it has no
 		# adverse effects.
-		if (defined $dh{NAME} and $opts->{'named'}) {
+		if (defined $dh{NAME} and $named) {
 			$filename="$dh{NAME}.$filename";
 		}
 
@@ -1154,7 +1154,7 @@ sub default_sourcedir {
 		} else {
 			# Avoid checking for hostarch+hostos unless we have reason
 			# to believe that they exist.
-			if ($check_expensive and $opts->{'support-architecture-restriction'}) {
+			if ($check_expensive and $support_architecture_restriction) {
 				my $cross_type = uc(package_cross_type($package));
 				push(@try,
 					 "debian/${package}.${filename}.".dpkg_architecture_value("DEB_${cross_type}_ARCH"),
