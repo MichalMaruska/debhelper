@@ -52,11 +52,26 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $overrides = pkgfile(
 		{
 			'named'                              => 0,
-			'support-architecture-restriction'   => 0,
+			'support-architecture-restriction'   => 1,
 		},
 		$package,
-		"lintian-overrides"
+		"lintian-overrides",
 	);
+	if (not compat(13) and package_multiarch($package) eq 'same') {
+		my $no_arch_overrides = pkgfile(
+			{
+				'named'                              => 0,
+				'support-architecture-restriction'   => 0,
+			},
+			$package,
+			"lintian-overrides",
+		);
+		if ($no_arch_overrides ne $overrides) {
+			my $msg = "Multi-Arch: same packages must have the same lintian-overrides. Please merge ${overrides}"
+			 . " into ${no_arch_overrides} and use lintian's syntax for architecture specific overrides";
+			error($msg);
+		}
+	}
 
 	if ($overrides ne '') {
 		install_dir($or_dir);
