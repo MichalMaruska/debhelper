@@ -358,6 +358,13 @@ stable.
 The tool B<dh_installtmpfiles> now runs with --remove on package removal, and
 --purge on package purge. systemd v256 is required for the latter.
 
+=item -
+
+The B<dh_lintian> tool no longer accepts architecture specific overrides files
+for packages with B<Multi-Arch: same> in F<debian/control>, since these would
+not be co-installable. Instances affected by this error should migrate to
+B<lintian> architecture specific overrides.
+
 =back
 
 =item v13
