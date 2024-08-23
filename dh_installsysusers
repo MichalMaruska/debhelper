@@ -101,7 +101,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		@sysusers_files = sort @sysusers_files;
 		# Generate a single systemd-sysusers invocation and just pass all detected files together
 		autoscript($package, 'postinst', 'postinst-sysusers', { 'CONFILE_BASENAME' => "@sysusers_files" });
-		addsubstvar($package, "misc:Depends", "systemd | systemd-standalone-sysusers | systemd-sysusers");
+		addsubstvar($package, "misc:Depends", "systemd | systemd-standalone-sysusers | systemd-sysusers | opensysusers");
 	}
 
 }
