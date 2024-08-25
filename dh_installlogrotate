@@ -44,7 +44,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $file = pkgfile(
 		{
-			'named'                              => 0,
+			'named'                              => 1,
 			'support-architecture-restriction'   => 0,
 		},
 		$package,
