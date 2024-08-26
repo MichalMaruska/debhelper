@@ -1,3 +1,13 @@
+debhelper (13.20-maruska) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * dh_install{check,rotate}: Re-added `named` `pkgfile`s in compat 14+
+
+  [ Michal Maruska ]
+  * Put GITSHA into control file, as dgit.
+
+ -- Michal Maruska <mmaruska@gmail.com>  Mon, 26 Aug 2024 10:18:01 +0200
+
 debhelper (13.20) unstable; urgency=medium
 
   [ Samuel Thibault ]
