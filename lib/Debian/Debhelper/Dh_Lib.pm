@@ -1499,7 +1499,7 @@ sub delsubstvar {
 
 	return _update_substvar($substvarfile, sub {
 		my ($line) = @_;
-		return $line if $line !~ m/^\Q${substvar}\E[?]?=/;
+		return $line if $line !~ m/^\Q${substvar}\E[?!]?=/;
 		return;
 	});
 }
@@ -1528,7 +1528,7 @@ sub addsubstvar {
 
 	my $update_logic = sub {
 		my ($line) = @_;
-		return $line if $line !~ m/^\Q${substvar}\E([?]?=)(.*)/;
+		return $line if $line !~ m/^\Q${substvar}\E([?!]?=)(.*)/;
 		my $assignment_type = $1;
 		my %items = map { $_ => 1 } split(", ", $2);
 		$present = 1;
