@@ -1,3 +1,20 @@
+debhelper (13.21~1.gbpaca7f6) UNRELEASED; urgency=medium
+
+  ** SNAPSHOT build @aca7f6370374d6463046bd58f863a4b7c77540f6 **
+
+  * dh_installlog{check,rotate}: Re-added `named` `pkgfile`s in
+    compat 14+
+  * Dh_Lib.pm: Recongnize `!=` substvars.
+    Thanks to Guillem Jover <guillem@debian.org>
+  * Revert "dh_installsysusers: Temporarily add opensysusers
+    alternative". The work around is no longer needed. Thanks
+    to Samuel Thibault <sthibault@debian.org>.
+  * Fix some typos and formatting issues in manpages.
+    Thanks to Christoph Brinkhaus <c.brinkhaus@t-online.de>
+    (Closes: #1083170)
+
+ -- Niels Thykier <niels@thykier.net>  Thu, 07 Nov 2024 12:46:45 +0000
+
 debhelper (13.20) unstable; urgency=medium
 
   [ Samuel Thibault ]
