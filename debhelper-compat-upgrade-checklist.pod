@@ -108,7 +108,7 @@ commands that made assumptions about the command order.
 Additionally, B<dh_strip_nondeterminism> and B<dh_compress> plus any commands added
 by third-party add-ons using these as anchors will no longer be able to rely on the
 mode/ownership normalization by B<dh_fixperms>, which may expose bugs in the form
-of incorrect mode or ownership in the resulting deb.
+of incorrect mode or ownership in the resulting binary package.
 
 Please file any such bugs against the relevant tool. Feel free to include the
 B<debhelper> maintainers in CC.
@@ -239,8 +239,8 @@ when the substvars need tweaking.  The most common case involves using
 the B<-d> option from B<dpkg-shlibdeps> possibly via B<dh_shlibdeps>.
 
 Note: This change will cause false-positives from an unfixed
-B<lintian>. Please check L<https://bugs.debian.org/1067653> for
-B<lintian> support for this change.
+L<lintian(1)>. Please check L<https://bugs.debian.org/1067653> for
+L<lintian(1)> support for this change.
 
 =item -
 
@@ -273,7 +273,7 @@ In compat 15 (or later), this is changed to an error.
 
 =item -
 
-It is now triggers a warning to use a packaging file without the package prefix for
+It now triggers a warning to use a packaging file without the package prefix for
 B<--name> even if the source package only produces one binary package. As example,
 if you had a F<debian/bar.service> with the following snippet in F<debian/rules>:
 
@@ -286,7 +286,7 @@ In compat 15 (or later), this is changed to an error.
 
 =item -
 
-The default look up rules for B<Dh_Lib> based tools now assumes that configuration
+The default look up rules for B<Dh_Lib> based tools now assume that configuration
 files are no longer named (B<--name>) nor support architecture restrictions by default.
 If you work with a third-party debhelper-like tool and need support for either of these
 features, please file a bug against the tool asking it to declare its configuration
@@ -355,15 +355,15 @@ stable.
 
 =item -
 
-The tool B<dh_installtmpfiles> now runs with --remove on package removal, and
---purge on package purge. systemd v256 is required for the latter.
+The tool B<dh_installtmpfiles> now runs with B<--remove> on package removal, and
+B<--purge> on package purge. systemd v256 is required for the latter.
 
 =item -
 
 The B<dh_lintian> tool no longer accepts architecture specific overrides files
 for packages with B<Multi-Arch: same> in F<debian/control>, since these would
 not be co-installable. Instances affected by this error should migrate to
-B<lintian> architecture specific overrides.
+L<lintian(1)> architecture specific overrides.
 
 =back
 
@@ -418,8 +418,8 @@ are identical).
 
 =item -
 
-The B<dh_auto_*> helpers now reset the environment variables B<HOME>
-and common B<XDG_*> variable.  Please see description of the
+The B<dh_auto_*> helpers now reset the environment variable B<HOME>
+and the common B<XDG_*> variables.  Please see description of the
 environment variables in L<debhelper(1)/ENVIRONMENT> for how this is handled.
 
 I<This feature changed between debhelper 13 and debhelper 13.2.>
@@ -724,7 +724,7 @@ B<dh_installinfo> incorrectly ignore B<--sourcedir>.
 =item -
 
 The B<perl-makemaker> and B<perl-build> build systems no longer pass
-B<-I.> to perl.  Packages that relies on this behavior can often use the
+B<-I.> to perl.  Packages that rely on this behavior can often use the
 B<PERL5LIB> environment variable as a substitute.  E.g. by adding
 B<export PERL5LIB=.> in their debian/rules file (or similar).
 
