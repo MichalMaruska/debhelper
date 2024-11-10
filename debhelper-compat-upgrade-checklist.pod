@@ -167,7 +167,7 @@ about to happen.
 
 =item -
 
-The B<dh_control> tool now automatically applies relationship substvars to
+The B<dh_gencontrol> tool now automatically applies relationship substvars to
 relevant fields. That means that many substvars such as B<${misc:Depends}>
 and B<${shlibs:Depends}> no longer need to be explicitly mentioned in
 F<debian/control>. This applies to any substvar named after a field that
