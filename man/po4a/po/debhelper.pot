@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-08-18 09:44+0200\n"
+"POT-Creation-Date: 2024-11-10 11:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2225,7 +2225,7 @@ msgid ""
 "commands added by third-party add-ons using these as anchors will no longer "
 "be able to rely on the mode/ownership normalization by B<dh_fixperms>, which "
 "may expose bugs in the form of incorrect mode or ownership in the resulting "
-"deb."
+"binary package."
 msgstr ""
 
 #. type: textblock
@@ -2316,12 +2316,12 @@ msgstr ""
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:170
 msgid ""
-"The B<dh_gencontrol> tool now automatically applies relationship substvars to "
-"relevant fields. That means that many substvars such as B<${misc:Depends}> "
-"and B<${shlibs:Depends}> no longer need to be explicitly mentioned in "
-"F<debian/control>. This applies to any substvar named after a field that the "
-"installed version of B<dpkg> considers a relation or dependency-like "
-"field. At the time of writing, the list consists of:"
+"The B<dh_gencontrol> tool now automatically applies relationship substvars "
+"to relevant fields. That means that many substvars such as "
+"B<${misc:Depends}> and B<${shlibs:Depends}> no longer need to be explicitly "
+"mentioned in F<debian/control>. This applies to any substvar named after a "
+"field that the installed version of B<dpkg> considers a relation or "
+"dependency-like field. At the time of writing, the list consists of:"
 msgstr ""
 
 #. type: textblock
@@ -2412,8 +2412,8 @@ msgstr ""
 #: debhelper-compat-upgrade-checklist.pod:241
 msgid ""
 "Note: This change will cause false-positives from an unfixed "
-"L<lintian(1)>. Please check L<https://bugs.debian.org/1067653> for L<lintian(1)> "
-"support for this change."
+"L<lintian(1)>. Please check L<https://bugs.debian.org/1067653> for "
+"L<lintian(1)> support for this change."
 msgstr ""
 
 #. type: textblock
@@ -2463,8 +2463,8 @@ msgstr ""
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:276
 msgid ""
-"It is now triggers a warning to use a packaging file without the package "
-"prefix for B<--name> even if the source package only produces one binary "
+"It now triggers a warning to use a packaging file without the package prefix "
+"for B<--name> even if the source package only produces one binary "
 "package. As example, if you had a F<debian/bar.service> with the following "
 "snippet in F<debian/rules>:"
 msgstr ""
@@ -2472,7 +2472,7 @@ msgstr ""
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:289
 msgid ""
-"The default look up rules for B<Dh_Lib> based tools now assumes that "
+"The default look up rules for B<Dh_Lib> based tools now assume that "
 "configuration files are no longer named (B<--name>) nor support architecture "
 "restrictions by default.  If you work with a third-party debhelper-like tool "
 "and need support for either of these features, please file a bug against the "
@@ -2640,8 +2640,8 @@ msgstr ""
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:421
 msgid ""
-"The B<dh_auto_*> helpers now reset the environment variables B<HOME> and "
-"common B<XDG_*> variable.  Please see description of the environment "
+"The B<dh_auto_*> helpers now reset the environment variable B<HOME> and the "
+"common B<XDG_*> variables.  Please see description of the environment "
 "variables in L<debhelper(1)/ENVIRONMENT> for how this is handled."
 msgstr ""
 
@@ -3095,9 +3095,9 @@ msgstr ""
 #: debhelper-compat-upgrade-checklist.pod:726
 msgid ""
 "The B<perl-makemaker> and B<perl-build> build systems no longer pass B<-I.> "
-"to perl.  Packages that rely on this behavior can often use the "
-"B<PERL5LIB> environment variable as a substitute.  E.g. by adding B<export "
-"PERL5LIB=.> in their debian/rules file (or similar)."
+"to perl.  Packages that rely on this behavior can often use the B<PERL5LIB> "
+"environment variable as a substitute.  E.g. by adding B<export PERL5LIB=.> "
+"in their debian/rules file (or similar)."
 msgstr ""
 
 #. type: textblock
