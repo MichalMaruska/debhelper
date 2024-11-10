@@ -6,10 +6,10 @@
 # 2024 Christoph Brinkhaus
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 13.15.3\n"
+"Project-Id-Version: debhelper 13.20\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2024-08-18 09:44+0200\n"
-"PO-Revision-Date: 2023-01-11 22:00+0100\n"
+"PO-Revision-Date: 2024-10-05 16:00+0200\n"
 "Last-Translator: Christoph Brinkhaus <c.brinkhaus@t-online.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -1331,10 +1331,8 @@ msgstr ""
 "(wie für die Veröffentlichung einer neuen Funktionalität oder einer "
 "Fehlerbehebung innerhalb einer Kompatibilitätsstufe)."
 
-# FIXME: s/source/B<source>/
 #. type: textblock
 #: debhelper.pod:517
-#, fuzzy
 #| msgid ""
 #| "Note that debhelper does not provide debhelper-compat for experimental or "
 #| "beta compatibility levels; packages experimenting with those "
@@ -1348,10 +1346,10 @@ msgid ""
 "B<Source> stanza of the F<debian/control> file (or, if only for selected "
 "commands, the B<DH_COMPAT> environment variable)."
 msgstr ""
-"Beachten Sie, dass Debhelper-Compat nicht für experimentelle oder Beta-"
-"Kompatibilitätsstufen vorgesehen ist. Pakete, die mit diesen "
+"Beachten Sie, dass Debhelper-Compat nicht für experimentelle oder "
+"Beta-Kompatibilitätsstufen vorgesehen ist. Pakete, die mit diesen "
 "Kompatibilitätsstufen experimentieren, sollten die Kompatibilitätsstufe in "
-"das Feld B<X-DH-Compat> des Source-Abschnitts der Datei F<debian/control> "
+"das Feld B<X-DH-Compat> des B<Source>-Abschnitts der Datei F<debian/control> "
 "eintragen (oder, falls nur für bestimmte Befehle, in die Umgebungsvariable "
 "B<DH_COMPAT>)."
 
@@ -2722,12 +2720,19 @@ msgid ""
 "If the package needs the short-cuts for single-binary packages, it must "
 "explicitly activate the B<single-binary> add-in."
 msgstr ""
+"Die Erweiterung B<single-binary> für B<dh> wird nicht mehr implizit von "
+"Quellpaketen aktiviert, die einen einzelnen Eintrag B<Package> in "
+"F<debian/control> haben. Falls das Paket diefür Abkürzungen für "
+"Einzel-Binärpakete benötigt, muss es die Erweiterung B<single-binary> "
+"explizit aktivieren."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:40
 msgid ""
 "This can be done via a B<Build-Depends> on B<dh-sequence-single-binary>."
 msgstr ""
+"Das kann mit einem B<Build-Depends> auf B<dh-sequence-single-binary> "
+"erreicht werden."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:42
@@ -2736,6 +2741,9 @@ msgid ""
 "compat 14 can now be removed to simplify F<debian/rules> without triggering "
 "the warning."
 msgstr ""
+"Jedes B<--without single-binary>, das an B<dh> übergeben wurde, um die "
+"Warnung im Kompatibilitätsmodus 14 zu vermeiden, kann jetzt entfernt werden, "
+"um F<debian/rules> zu vereinfachen, ohne die Warnung auszulösen."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:47
@@ -2764,6 +2772,9 @@ msgstr ""
 "Voreinstellung für alle Pakete verwendet wird. Diese Fälle bleiben "
 "unverändert."
 
+# FIXME In #: debhelper-compat-upgrade-checklist.pod:276
+#       it triggers a warning to use... Is just the context different?
+#       Please clarify.
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:59
 msgid ""
@@ -2772,11 +2783,15 @@ msgid ""
 "example, if you had a F<debian/bar.service> with the following snippet in "
 "F<debian/rules>:"
 msgstr ""
+"Es ist jetzt ein Fehler, eine Paket-Datei ohne den Paket-Prefix für "
+"B<--name> zu verwenden, selbst wenn das Quellpaket nur ein Binärpaket "
+"erzeugt. Falls Sie beispielsweise einen F<debian/bar.service> mit dem "
+"folgenden Schnipsel in F<debian/rules> hatten:"
 
 #. type: verbatim
 #: debhelper-compat-upgrade-checklist.pod:63
 #: debhelper-compat-upgrade-checklist.pod:280
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid ""
 #| " override_dh_installinit:\n"
 #| "\tdh_installinit -pfoo --only-scripts\n"
@@ -2787,9 +2802,8 @@ msgid ""
 "    dh_installsystemd -p foo --name bar\n"
 "\n"
 msgstr ""
-" override_dh_installinit:\n"
-"\tdh_installinit -pfoo --only-scripts\n"
-"\tdh_installinit --remaining\n"
+" override_dh_installsystemd:\n"
+"    dh_installsystemd -p foo --name bar\n"
 "\n"
 
 #. type: textblock
@@ -2798,6 +2812,8 @@ msgstr ""
 msgid ""
 "Then you need to rename F<debian/bar.service> to F<debian/foo.bar.service>."
 msgstr ""
+"Dann müssen Sie F<debian/bar.service> in F<debian/foo.bar.service> "
+"umbenennen."
 
 #. type: =item
 #: debhelper-compat-upgrade-checklist.pod:70
@@ -2844,6 +2860,10 @@ msgid ""
 "B<dh_compress>, and B<dh_fixperm>. Previously, these three commands were run "
 "in the listed order between B<dh_installxfonts> and B<dh_missing>."
 msgstr ""
+"Die Reihenfolge und Platzierung für B<dh_strip_nondeterminism>, "
+"B<dh_compress>, und B<dh_fixperm> hat sich geändert. Früher wurden diese "
+"drei Befehle in der aufgeführten Reihenfolge zwischen B<dh_installxfonts> "
+"und B<dh_missing> ausgeführt."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:99
@@ -2852,6 +2872,9 @@ msgid ""
 "(arch:any) and before B<dh_installdeb>. Additionally, their new order is "
 "B<dh_fixperms>, B<dh_strip_nondeterminism>, and then B<dh_compress>."
 msgstr ""
+"Ihre neue Platzierung ist nach B<dh_missing> (arch:all) oder B<dh_shlibdeps> "
+"(arch:any) und vor B<dh_installdeb>. Außerdem ist ihre neue Reihenfolge "
+"B<dh_fixperms>, B<dh_strip_nondeterminism> und dann B<dh_compress>."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:104
@@ -2860,7 +2883,12 @@ msgid ""
 "these three commands as anchor or to hook targets for any of these commands "
 "that made assumptions about the command order."
 msgstr ""
+"Diese Änderung macht möglicherweise Aktualisierungen von Erweiterungen von "
+"Drittanbietern notwendig, die einen dieser drei Befehle als Anker oder "
+"Hook-Ziele für einen dieser Befehle verwenden, und die Annahmen über die "
+"Reihenfolge der Befehle treffen."
 
+# FIXME does "resultig deb" mean "resulting deb file"?
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:108
 msgid ""
@@ -2870,6 +2898,11 @@ msgid ""
 "may expose bugs in the form of incorrect mode or ownership in the resulting "
 "deb."
 msgstr ""
+"Außerdem können sich B<dh_strip_nondeterminism> und B<dh_compress> sowie "
+"alle Erweiterungen von Drittanbietern, die diese Anker verwenden, nicht mehr "
+"auf die »Mode/Ownership«-Normalisierung durch B<dh_fixperms> verlassen, was "
+"zur Offenlegung von Fehlern in der Art von falschen Modi oder Besitzrechten "
+"in der resultierenden »deb«-Datei führen kann."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:113
@@ -2877,6 +2910,8 @@ msgid ""
 "Please file any such bugs against the relevant tool. Feel free to include "
 "the B<debhelper> maintainers in CC."
 msgstr ""
+"Bitte melden Sie den Entwicklern der entsprechenden Werkzeugen jeden dieser "
+"Fehler. Sie können die Betreuer von B<debhelper> in Kopie setzen."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:118
@@ -2919,11 +2954,9 @@ msgstr ""
 "Sequenz nach B<dh_link> und nicht mehr nach B<dh_installinitramfs> "
 "ausgeführt."
 
-# FIXME: s/that has/that have/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:140
 #: debhelper-compat-upgrade-checklist.pod:148
-#, fuzzy
 #| msgid ""
 #| "I<< This item only applies to source packages that has exactly one "
 #| "B<Package> stanza in F<debian/control>. >>"
@@ -2943,10 +2976,15 @@ msgid ""
 "on is activated by default in compat 14 but not in compat 15 (see next "
 "bullet item)."
 msgstr ""
+"Der Befehl B<dh_auto_install> verwendet jetzt standardmäßig und "
+"bedingungslos B<--destdir=debian/tmp>. Der Spezialfall für Quellpakete, die "
+"ein einziges Binärpaket bauen, ist jetzt in die Erweiterung B<single-binary> "
+"von B<dh> verschoben worden. Bitte beachten Sie, dass diese Erweiterung im "
+"Kompatibilitätsmodus 14, aber nicht im Kompatibilitätsmodus 15 "
+"standardmäßig aktiviert ist (siehe den nächsten Punkt)."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:150
-#, fuzzy
 #| msgid ""
 #| "The B<dh> sequencer will warn if the B<single-binary> addon is implicitly "
 #| "activated to warn maintainers of the pending compat 15 change in "
@@ -2958,9 +2996,12 @@ msgid ""
 "reduce the changes of risks with this change.  In compat 15, the implicit "
 "activation will no longer trigger."
 msgstr ""
-"Der B<dh>-Sequenzer wird eine Warnung ausgeben, wenn die B<single-binary>-"
-"Erweiterung implizit aktiviert wurde, um Betreuer vor der anstehenden "
-"Kompat-15-Änderung in B<dh_auto_install> zu warnen."
+"Der B<dh>-Sequenzer wird eine Warnung ausgeben, wenn die "
+"B<single-binary>-Erweiterung implizit aktiviert wurde, um Betreuer vor der "
+"anstehenden Änderung in Kompatibilitätsstufe 15 in B<dh_auto_install> zu "
+"warnen. Die implizite Aktivierung ist eine Funktionalität für den Übergang, "
+"um das Risiko zu reduzieren, das diese Änderung mit sich bringt. In "
+"Kompatibilitätsstufe 15 wird die implizite Aktivierung nicht mehr auslösen."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:155
@@ -3076,7 +3117,7 @@ msgid ""
 "Depends}> can be removed entirely as examples of how the feature works."
 msgstr ""
 "Das bedeutet, dass zum Beispiel B<Depends: foo, ${misc:Depends}> in F<debian/"
-"control> zu B<Depends: foo> verkürzt werden kann. Ausserdem kann als "
+"control> zu B<Depends: foo> verkürzt werden kann. Außerdem kann als "
 "Beispiel für diese Funktionalität B<Depends: ${misc:Depends}, ${shlibs:"
 "Depends}> komplett entfernt werden."
 
@@ -3112,10 +3153,8 @@ msgstr ""
 "beinhaltet die Verwendung der Option B<-d> von B<dpkg-shlibdeps>, "
 "möglicherweise durch B<dh_shlibdeps>."
 
-# FIXME: s/This change changes/This change/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:241
-#, fuzzy
 #| msgid ""
 #| "Note: This change changes will cause false-positives from an unfixed "
 #| "B<lintian>. Please check L<https://bugs.debian.org/1067653> for "
@@ -3150,14 +3189,12 @@ msgstr ""
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:255
-#, fuzzy
 #| msgid ""
 #| "When using executable debhelper config files, please be aware of the "
 #| "following:"
 msgid "The debhelper configuration files are subject to the following changes:"
 msgstr ""
-"Wenn Sie ausführbare Debhelper-Konfigurationsdateien verwenden, sollten Sie "
-"Folgendes wissen:"
+"Die Debhelper-Konfigurationsdateien unterliegen den folgenden Änderungen:"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:261
@@ -3196,6 +3233,10 @@ msgid "In compat 15 (or later), this is changed to an error."
 msgstr ""
 "In Kompatibilitätsstufe 15 (oder neuer) ist das geändert zu einem Fehler."
 
+# FIXME It is now triggers a warning → Now it triggers a warning
+# FIXME In #: debhelper-compat-upgrade-checklist.pod:59
+#       it is an error to use... Is just the context different?
+#       Please clarify.
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:276
 msgid ""
@@ -3204,7 +3245,12 @@ msgid ""
 "package. As example, if you had a F<debian/bar.service> with the following "
 "snippet in F<debian/rules>:"
 msgstr ""
+"Jetzt wird eine Warnung ausgelöst, wenn eine Paket-Datei ohne den "
+"Paket-Prefix für B<--name> verwendet wird, selbst wenn das Quellpaket nur "
+"ein Binärpaket erzeugt. Falls Sie beispielsweise einen F<debian/bar.service> "
+"mit dem folgenden Schnipsel in F<debian/rules> hatten:"
 
+# FIXME now assumes → now assume
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:289
 msgid ""
@@ -3215,6 +3261,14 @@ msgid ""
 "tool asking it to declare its configuration file with the relevant options "
 "in its B<pkgfile> call."
 msgstr ""
+"Die standardmäßigen Nachschlageregeln für auf B<Dh_Lib> basierende "
+"Werkzeuge nehmen jetzt an, dass Konfigurationsdateien nicht mehr benannt "
+"werden (B<--name>) noch standardmäßig Architektureinschränkungen "
+"unterstützen. Falls Sie mit einem zu Debhelper ähnlichem Werkzeug eines "
+"Drittanbieters arbeiten, und Unterstützung für eine dieser Funktionalitäten "
+"benötigen, dann erstellen Sie bitte bei dem Werkzeug einen Fehlerbericht und "
+"bitten, seine Konfigurationsdatei mit den relevanten Optionen in seinem "
+"Aufruf B<pkgfile> bekanntzugeben."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:295
@@ -3225,6 +3279,13 @@ msgid ""
 "that is no longer supported, please file a feature request for the use-case "
 "and it might be restored."
 msgstr ""
+"Beachten Sie, dass B<debhelper> seine Regeln für die Mehrzahl seiner "
+"Werkzeuge basierend auf der Nutzungsanalyse über B<codesearch.debian.org> "
+"ebenfalls selbst anpasst. Sollten Sie sich auf eine Funktionalität "
+"verlassen, wie beispielsweise Architektureinschränkungen für eine gegebene "
+"Konfigurationsdatei, die nicht mehr unterstützt wird, so stellen Sie bitte "
+"ein Funktionalitätswunsch für diesen Anwendungsfall und sie wird "
+"möglicherweise wieder hergestellt."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:304
@@ -3300,10 +3361,8 @@ msgstr ""
 "B<dh_auto_install>, die Extra-Parameter an das Bausystem der Originalautoren "
 "weiterreicht, sollte überprüft werden."
 
-# FIXME: s/source/B<source>/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:348
-#, fuzzy
 #| msgid ""
 #| "The F<debian/compat> file is no longer accepted as a source for "
 #| "specifying the debhelper compat level. Put the compat level in the B<X-DH-"
@@ -3315,7 +3374,7 @@ msgid ""
 msgstr ""
 "Die Datei F<debian/compat> wird nicht mehr als Quelle zur Spezifikation der "
 "Debhelper-Kompatibilitätsstufe akzeptiert. Setzen Sie die "
-"Kompatibilitätsstufe in dem Feld B<X-DH-Compat> des Source-Abschnitts von "
+"Kompatibilitätsstufe in dem Feld B<X-DH-Compat> des B<Source>-Abschnitts von "
 "F<debian/control>."
 
 #. type: textblock
@@ -3330,13 +3389,19 @@ msgstr ""
 "Pakete zu beschädigen, die schon zu Kompatibilitätsstufe 14 migriert wurden, "
 "während diese Änderung noch experimentell war."
 
+#FIXME --remove → B<--remove>
+#FIXME --purge → B<--purge>
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:358
 msgid ""
 "The tool B<dh_installtmpfiles> now runs with --remove on package removal, "
 "and --purge on package purge. systemd v256 is required for the latter."
 msgstr ""
+"Das Werkzeug B<dh_installtmpfiles> führt nun B<--remove> beim Entfernen "
+"und B<--purge> beim vollständigen Löschen von Paketen aus. Für Letzteres ist "
+"Systemd v256 erforderlich."
 
+# FIXME B<lintian> → B<lintian>(1)
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:363
 msgid ""
@@ -3345,6 +3410,11 @@ msgid ""
 "these would not be co-installable. Instances affected by this error should "
 "migrate to B<lintian> architecture specific overrides."
 msgstr ""
+"Das Werkzeug B<dh_lintian> akzeptiert nicht mehr länger architekturabhängige "
+"Dateien zur Außerkraftsetzungen für Pakete mit B<Multi-Arch: same> in "
+"F<debian/control>, weil diese dann nicht mehr koinstallierbar wären. Fälle, "
+"die von diesem Fehler betroffen sind, sollten zu architekturabhängigen "
+"Außerkraftsetzungen von B<lintian>(1) wechseln."
 
 #. type: =item
 #: debhelper-compat-upgrade-checklist.pod:370
@@ -3436,9 +3506,9 @@ msgstr ""
 "einfachste Lösung, die Handbuchseite aus F<< debian/I<package>.manpages >> "
 "zu entfernen (davon ausgehend, dass beide Versionen identisch sind)."
 
+# FIXME B<XDG_*> variable → B<XDG_*> variables
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:421
-#, fuzzy
 #| msgid ""
 #| "The B<dh_auto_*> helpers now reset the environment variables B<HOME> and "
 #| "common B<XDG_*> variable.  Please see description of the environment "
@@ -3450,8 +3520,8 @@ msgid ""
 msgstr ""
 "Die B<dh_auto_*>-Hilfsprogramme setzen nun die Umgebungsvariablen B<HOME> "
 "und gebräuchliche B<XDG_*>-Variablen zurück. Wie damit umgegangen wird, "
-"können Sie Sie der Beschreibung für die Umgebungsvariablen in L</"
-"ENVIRONMENT> entnehmen."
+"können Sie der Beschreibung für die Umgebungsvariablen in "
+"L<debhelper(1)/ENVIRONMENT> entnehmen."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:425
@@ -3806,10 +3876,8 @@ msgstr "Beachten Sie das B<--> vor dem Parameter B<--libexecdir>."
 msgid "B<Retroactively removed in debhelper/13.5>:"
 msgstr "B<Rückwirkend in debhelper/13.5 entfernt:>"
 
-# FIXME: would no longer installs → no longer installs
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:593
-#, fuzzy
 #| msgid ""
 #| "The B<dh_installdeb> tool would no longer installs the maintainer "
 #| "provided F<conffiles> file as it was deemed unnecessary.  However, the "
@@ -3821,11 +3889,11 @@ msgid ""
 "upgrade> from dpkg/1.20 made the file relevant again and B<dh_installdeb> "
 "now installs it again in compat levels 12+."
 msgstr ""
-"Das B<dh_installdeb>-Werkzeug installiert nicht länger die vom Betreuer "
-"bereitgestellte F<conffiles>-Datei, weil das als unnötig erachtet wurde. Das "
-"B<remove-on-upgrade> aus Dpkg Version 1.20 machte die Datei jedoch wieder "
-"relevant und B<dh_installdeb> installiert sie jetzt wieder in den "
-"Kompatiblitätsstufen 12 und höher."
+"Das B<dh_installdeb>-Werkzeug sollte eigentlich nicht länger die vom "
+"Betreuer bereitgestellte F<conffiles>-Datei installieren, weil das als "
+"unnötig erachtet wurde. Das B<remove-on-upgrade> aus Dpkg Version 1.20 "
+"machte die Datei jedoch wieder relevant und B<dh_installdeb> installiert sie "
+"jetzt wieder in den Kompatiblitätsstufen 12 und höher."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:600
@@ -4080,10 +4148,9 @@ msgstr ""
 "Migrationshinweis: Ein Fehler in Debhelper 11 bis 11.1.5 führte "
 "fälschlicherweise dazu, dass B<dh_installinfo> B<--sourcedir> ignoriert hat."
 
-# FIXME s/can emulate it/can get an emulation of it/ (or emulate it)
+# FIXME that relies → that rely
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:726
-#, fuzzy
 #| msgid ""
 #| "The B<perl-makemaker> and B<perl-build> build systems no longer pass B<-I."
 #| "> to perl.  Packages that still need this behaviour can emulate it by "
@@ -4096,10 +4163,9 @@ msgid ""
 "PERL5LIB=.> in their debian/rules file (or similar)."
 msgstr ""
 "Die Bausysteme B<perl-makemaker> und B<perl-build> übergeben B<-I.> nicht "
-"mehr an Perl. Pakete, die dieses Verhalten immer noch benötigen, können es "
-"durch Verwendung der Umgebungsvariable B<PERL5LIB> emulieren, z. B. durch "
-"Eintragen von B<export PERL5LIB=.> in ihre »debian/rules«-Datei (oder "
-"dergleichen)."
+"mehr an Perl. Pakete, die dieses Verhalten benötigen, können meistens die "
+"Umgebungsvariable B<PERL5LIB> als Ersatz verwenden, z. B. durch Eintragen "
+"von B<export PERL5LIB=.> in ihre »debian/rules«-Datei (oder dergleichen)."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:733
@@ -4470,10 +4536,8 @@ msgstr "v9"
 msgid "Changes from v8 are:"
 msgstr "Änderungen gegenüber v8 sind:"
 
-# FIXME: s/autoconf/B<autoconf>/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:916
-#, fuzzy
 #| msgid ""
 #| "Multiarch support. In particular, B<dh_auto_configure> passes multiarch "
 #| "directories to autoconf in --libdir and --libexecdir."
@@ -4507,10 +4571,8 @@ msgstr ""
 "B<dh_strip> komprimiert Debug-Symboldateien, um die Größe der installierten "
 "»-dbg«-Paketen zu verringern."
 
-# FIXME: s/autoconf/B<autoconf>/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:933
-#, fuzzy
 #| msgid ""
 #| "B<dh_auto_configure> does not include the source package name in --"
 #| "libexecdir when using autoconf."
@@ -5013,8 +5075,8 @@ msgid ""
 "B<dh> I<sequence> [B<--with> I<addon>[B<,>I<addon> ...]] [B<--list>] "
 "[S<I<debhelper options>>]"
 msgstr ""
-"B<dh> I<Sequenz> [B<--with> I<Add-on>[B<,>I<Add-on> …]] [B<--list>] "
-"[S<I<Debhelper-Optionen>>]"
+"B<dh> I<Sequenz> [B<--with> I<Erweiterung>[B<,>I<Erweiterung> …]] "
+"[B<--list>] [S<I<Debhelper-Optionen>>]"
 
 #. type: textblock
 #: dh:28
@@ -5632,7 +5694,7 @@ msgstr "OPTIONEN"
 #. type: =item
 #: dh:261
 msgid "B<--with> I<addon>[B<,>I<addon> ...]"
-msgstr "B<--with> I<Erweiterung>[B<,>I<Add-on> …]"
+msgstr "B<--with> I<Erweiterung>[B<,>I<Erweiterung> …]"
 
 #. type: textblock
 #: dh:263
@@ -5646,10 +5708,11 @@ msgid ""
 msgstr ""
 "fügt die Debhelper-Befehle, die durch die genannte Erweiterung angegeben "
 "wurden an geeigneten Stellen der ausgeführten Befehlssequenz hinzu. Diese "
-"Option kann mehr als einmal wiederholt werden oder es können mehrere Add-ons "
-"durch Kommas getrennt aufgeführt werden. Dies wird benutzt, wenn es ein "
-"Fremdpaket gibt, das Debhelper-Befehle bereitstellt. Dokumentation über die "
-"Sequenz-Erweiterungsschnittstelle finden Sie in der Datei F<PROGRAMMING>."
+"Option kann mehr als einmal wiederholt werden oder es können mehrere "
+"Erweiterungen durch Kommas getrennt aufgeführt werden. Dies wird benutzt, "
+"wenn es ein Fremdpaket gibt, das Debhelper-Befehle bereitstellt. "
+"Dokumentation über die Sequenz-Erweiterungsschnittstelle finden Sie in der "
+"Datei F<PROGRAMMING>."
 
 #. type: textblock
 #: dh:270
@@ -6716,7 +6779,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_auto_install:32
-#, fuzzy
 #| msgid ""
 #| "In compat 15 or later, B<dh_auto_install> will use F<debian/tmp> as the "
 #| "default B<--destdir> and should be moved from there to the appropriate "
@@ -6731,7 +6793,7 @@ msgid ""
 "the B<single-binary> addon for L<dh(1)> is activated, then it will pass an "
 "explicit B<< --destdir=debian/I<package>/ >> to B<dh_auto_install>."
 msgstr ""
-"In Kompatibilitätsstufe 15 oder neuer verwendet B<dh_auto_install> F<debian/"
+"In Kompatibilitätsstufe 14 oder neuer verwendet B<dh_auto_install> F<debian/"
 "tmp> als Vorgabe-B<--destdir> und sollte von dort mit Hilfe von "
 "L<dh_install(1)> oder vergleichbaren Werkzeugen in das passende "
 "Paketbauverzeichnis verschoben werden. Falls jedoch die B<single-binary>-"
@@ -9734,7 +9796,7 @@ msgstr ""
 #. type: textblock
 #: dh_installemacsen:5
 msgid "dh_installemacsen - register an Emacs add on package"
-msgstr "dh_installemacsen - registriert ein Emacs-Add-on-Paket"
+msgstr "dh_installemacsen - registriert ein Emacs-Erweiterungspaket"
 
 #. type: textblock
 #: dh_installemacsen:17
@@ -9765,7 +9827,7 @@ msgid ""
 "L<dh_installdeb(1)> for an explanation of how this works."
 msgstr ""
 "Es erzeugt außerdem automatisch die F<preinst>, F<postinst>- und F<prerm>-"
-"Befehle, die benötigt sind, um ein Paket als ein Emacs-Add-on-Paket zu "
+"Befehle, die benötigt sind, um ein Paket als ein Emacs-Erweiterungspaket zu "
 "registrieren. Die Befehle werden den Betreuerskripten durch B<dh_installdeb> "
 "hinzugefügt. Eine Erklärung, wie das funktioniert, finden Sie in "
 "L<dh_installdeb(1)>."
@@ -13042,7 +13104,6 @@ msgstr ""
 msgid "B<-k>, B<--keep-debug>"
 msgstr "B<-k>, B<--keep-debug>"
 
-# FIXME: First sentence does not make sense
 #. type: textblock
 #: dh_strip:78
 msgid ""
