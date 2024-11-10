@@ -3038,14 +3038,14 @@ msgstr ""
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:170
 msgid ""
-"The B<dh_control> tool now automatically applies relationship substvars to "
+"The B<dh_gencontrol> tool now automatically applies relationship substvars to "
 "relevant fields. That means that many substvars such as B<${misc:Depends}> "
 "and B<${shlibs:Depends}> no longer need to be explicitly mentioned in "
 "F<debian/control>. This applies to any substvar named after a field that the "
 "installed version of B<dpkg> considers a relation or dependency-like field. "
 "At the time of writing, the list consists of:"
 msgstr ""
-"Das Werkzeug B<dh_control> wendet nun automatisch Ersetzungsvariable mit "
+"Das Werkzeug B<dh_gencontrol> wendet nun automatisch Ersetzungsvariable mit "
 "Beziehungen auf die relevanten Felder an. Das bedeutet, dass viele "
 "Ersetzungsvariable wie B<${misc:Depends}> und B<${shlibs:Depends}> nicht "
 "mehr explizit in F<debian/control> aufgeführt werden müssen. Das betrifft "
@@ -3157,16 +3157,16 @@ msgstr ""
 #: debhelper-compat-upgrade-checklist.pod:241
 #| msgid ""
 #| "Note: This change changes will cause false-positives from an unfixed "
-#| "B<lintian>. Please check L<https://bugs.debian.org/1067653> for "
-#| "B<lintian> support for this change."
+#| "L<lintian(1)>. Please check L<https://bugs.debian.org/1067653> for "
+#| "L<lintian(1)> support for this change."
 msgid ""
-"Note: This change will cause false-positives from an unfixed B<lintian>. "
-"Please check L<https://bugs.debian.org/1067653> for B<lintian> support for "
+"Note: This change will cause false-positives from an unfixed L<lintian(1)>. "
+"Please check L<https://bugs.debian.org/1067653> for L<lintian(1)> support for "
 "this change."
 msgstr ""
 "Hinweis: Diese Änderung wird Falsch-positiv-Bewertungen von einem nicht "
-"korrigiertem B<lintian> verursachen. Bitte prüfen Sie anhand von L<https://"
-"bugs.debian.org/1067653>, ob B<lintian> diese Änderung unterstützt."
+"korrigiertem L<lintian(1)> verursachen. Bitte prüfen Sie anhand von L<https://"
+"bugs.debian.org/1067653>, ob L<lintian(1)> diese Änderung unterstützt."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:247
@@ -3394,27 +3394,27 @@ msgstr ""
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:358
 msgid ""
-"The tool B<dh_installtmpfiles> now runs with --remove on package removal, "
-"and --purge on package purge. systemd v256 is required for the latter."
+"The tool B<dh_installtmpfiles> now runs with B<--remove> on package removal, "
+"and B<--purge> on package purge. systemd v256 is required for the latter."
 msgstr ""
 "Das Werkzeug B<dh_installtmpfiles> führt nun B<--remove> beim Entfernen "
 "und B<--purge> beim vollständigen Löschen von Paketen aus. Für Letzteres ist "
 "Systemd v256 erforderlich."
 
-# FIXME B<lintian> → B<lintian>(1)
+# FIXME L<lintian(1)> → L<lintian(1)>(1)
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:363
 msgid ""
 "The B<dh_lintian> tool no longer accepts architecture specific overrides "
 "files for packages with B<Multi-Arch: same> in F<debian/control>, since "
 "these would not be co-installable. Instances affected by this error should "
-"migrate to B<lintian> architecture specific overrides."
+"migrate to L<lintian(1)> architecture specific overrides."
 msgstr ""
 "Das Werkzeug B<dh_lintian> akzeptiert nicht mehr länger architekturabhängige "
 "Dateien zur Außerkraftsetzungen für Pakete mit B<Multi-Arch: same> in "
 "F<debian/control>, weil diese dann nicht mehr koinstallierbar wären. Fälle, "
 "die von diesem Fehler betroffen sind, sollten zu architekturabhängigen "
-"Außerkraftsetzungen von B<lintian>(1) wechseln."
+"Außerkraftsetzungen von L<lintian(1)> wechseln."
 
 #. type: =item
 #: debhelper-compat-upgrade-checklist.pod:370
@@ -4158,7 +4158,7 @@ msgstr ""
 #| "PERL5LIB=.> in their debian/rules file (or similar)."
 msgid ""
 "The B<perl-makemaker> and B<perl-build> build systems no longer pass B<-I.> "
-"to perl.  Packages that relies on this behavior can often use the "
+"to perl.  Packages that rely on this behavior can often use the "
 "B<PERL5LIB> environment variable as a substitute.  E.g. by adding B<export "
 "PERL5LIB=.> in their debian/rules file (or similar)."
 msgstr ""
