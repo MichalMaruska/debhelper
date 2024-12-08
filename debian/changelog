@@ -4,7 +4,7 @@ debhelper (13.21~1.gbpaca7f6) UNRELEASED; urgency=medium
 
   * dh_installlog{check,rotate}: Re-added `named` `pkgfile`s in
     compat 14+
-  * Dh_Lib.pm: Recongnize `!=` substvars.
+  * Dh_Lib.pm: Recognize `!=` substvars.
     Thanks to Guillem Jover <guillem@debian.org>
   * Revert "dh_installsysusers: Temporarily add opensysusers
     alternative". The work around is no longer needed. Thanks
