@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 192;
+use Test::More tests => 172;
 
 use File::Temp qw(tempdir);
 use File::Basename qw(dirname);
@@ -139,12 +139,6 @@ sub run_auto_buildable_tests {
 	create_empty_file("${sourcedir}/Build"); # forced in source
 	test_check_auto_buildable($bs{perl_build}, "Build.PL+Build", 1);
 	rm_files("${sourcedir}/Build.PL", "${sourcedir}/Build");
-
-	# Python Distutils
-	test_check_auto_buildable($bs{python_distutils}, "no setup.py", 0);
-	create_empty_file("${sourcedir}/setup.py");
-	test_check_auto_buildable($bs{python_distutils}, "setup.py", 1);
-	rm_files("${sourcedir}/setup.py");
 }
 
 sub run_autoselection_tests {
@@ -174,11 +168,6 @@ sub run_autoselection_tests {
 	create_empty_file("$builddir/Makefile");
 	test_autoselection("makefile", "makefile", %options);
 	rm_files("$builddir/Makefile");
-
-	# Python Distutils
-	create_empty_file("${sourcedir}/setup.py");
-	test_autoselection("python_distutils", "python_distutils", %options);
-	rm_files("${sourcedir}/setup.py");
 
 	# Perl Build
 	create_empty_file("${sourcedir}/Build.PL");
