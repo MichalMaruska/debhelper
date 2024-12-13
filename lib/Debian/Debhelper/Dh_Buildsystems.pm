@@ -24,7 +24,6 @@ our @BUILDSYSTEMS = (
 	(! compat(7) ? "perl_build" : ()),
 	"perl_makemaker",
 	"makefile",
-	"python_distutils",
 	(compat(7) ? "perl_build" : ()),
 	"cmake+makefile",
 	"cmake+ninja",
