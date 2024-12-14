@@ -122,6 +122,7 @@ on_pkgs_in_parallel {
 					"${tmp}/usr/include",
 					"${tmp}/usr/share/applications",
 					"${tmp}/usr/share/lintian/overrides",
+					"${tmp}/usr/share/themes",
 				], '0644', '-type f');
 
 		# nor should perl modules.
