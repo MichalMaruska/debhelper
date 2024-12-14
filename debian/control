@@ -54,7 +54,12 @@ Breaks:
  meson (<< 0.40.0~),
 Suggests:
  dh-make,
+Replaces:
+ dh-buildinfo,
 Provides:
+# Per #1068809, debhelper will temporarily provides/replaces/conflicts on
+# dh-buildinfo to ease the transition
+ dh-buildinfo,
  dh-sequence-dwz,
  dh-sequence-elf-tools,
  dh-sequence-installinitramfs,
@@ -63,6 +68,8 @@ Provides:
  dh-sequence-single-binary,
  dh-sequence-systemd,
  ${dh:CompatLevels},
+Conflicts:
+ dh-buildinfo,
 Multi-Arch: foreign
 Description: helper programs for debian/rules
  A collection of programs that can be used in a debian/rules file to
