@@ -166,6 +166,7 @@ sub install {
 			update_env => _get_meson_env(),
 		);
 		$this->doit_in_builddir(\%options, 'meson', 'install', '--destdir', $destdir, @args);
+		$this->ensure_minimal_permissions($destdir) if not compat(13);
 	}
 	return 1;
 }

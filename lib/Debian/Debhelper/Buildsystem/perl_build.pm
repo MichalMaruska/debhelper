@@ -91,6 +91,7 @@ sub install {
 	my $this=shift;
 	my $destdir=shift;
 	$this->do_perl("Build", "install", "--destdir", "$destdir", "--create_packlist", 0, @_);
+	$this->ensure_minimal_permissions($destdir) if not compat(13);
 }
 
 sub clean {

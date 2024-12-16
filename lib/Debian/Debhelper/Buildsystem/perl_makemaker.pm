@@ -106,6 +106,7 @@ sub install {
 	else {
 		$this->SUPER::install($destdir, "PREFIX=/usr", @_);
 	}
+	$this->ensure_minimal_permissions($destdir) if not compat(13);
 }
 
 1

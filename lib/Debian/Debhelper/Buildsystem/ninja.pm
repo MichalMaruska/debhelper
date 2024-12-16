@@ -7,7 +7,7 @@ package Debian::Debhelper::Buildsystem::ninja;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(%dh dpkg_architecture_value);
+use Debian::Debhelper::Dh_Lib qw(%dh dpkg_architecture_value compat);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 sub DESCRIPTION {
@@ -73,6 +73,7 @@ sub install {
 		}
 	);
 	$this->doit_in_builddir(\%options, $this->{buildcmd}, "install", @_);
+	$this->ensure_minimal_permissions($destdir) if not compat(13);
 }
 
 sub clean {

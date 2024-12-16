@@ -582,6 +582,13 @@ sub clean {
 }
 
 
+sub ensure_minimal_permissions {
+	my ($this, $directory) = @_;
+	if (-d $directory) {
+		print_and_doit('chmod', '-R', 'u+rwX', $directory);
+	}
+}
+
 sub _create_buildsystem_instance {
 	my ($full_name, $required, %bsopts) = @_;
 	my @parts = split(m{[+]}, $full_name, 2);

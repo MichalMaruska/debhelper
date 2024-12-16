@@ -192,6 +192,7 @@ sub install {
 	$this->make_first_existing_target(['install'],
 		"DESTDIR=$destdir",
 		"AM_UPDATE_INFO_DIR=no", @_);
+	$this->ensure_minimal_permissions($destdir) if not compat(13);
 }
 
 sub clean {

@@ -252,6 +252,34 @@ will not have to do anything for this migration.
 
 =item -
 
+When running B<dh_auto_install>, B<debhelper> provided build systems. will now ensure
+all paths in the B<destdir> have minimal user permissions (B<chmod -R u+rwX>) to avoid
+weird I<permission denied> errors during builds.
+
+Third-party provided debhelper build systems are recommended to support this as well.
+This can be done by running
+
+     $this->ensure_minimal_permissions($destdir) if not compat(13);
+
+in the B<debhelper> Buildsystem code from their B<sub install> implementation after
+the upstream code has been run.
+
+If you are not using B<dh_auto_install> and you run into weird I<permission denied>
+errors, you can often solve this by running B<chmod -R u+rwX DIRECTORY> after running
+the install target from the upstream build system.
+
+Please take care to check if your package has any special cases for permissions where
+files or directories for some reason must not have the "user write bit" set. Known
+cases are B<*.ali> files and B</etc/sudoers.d>, which B<dh_fixperms> will fix up by
+default.
+
+The problem with uncommon permissions have always been present in theory. However, it
+has become considerable more visible with B<dh_fixperms> being run later in the
+sequence as of compat 14 and with the move to remove B<fakeroot> by default (which
+papered over some of these issues). This change is aimed at mitigating the problem.
+
+=item -
+
 The debhelper configuration files are subject to the following changes:
 
 =over 4

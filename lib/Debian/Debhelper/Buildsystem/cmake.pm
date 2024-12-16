@@ -216,6 +216,7 @@ sub install {
 			}
 		);
 		print_and_doit(\%options, 'cmake', '--install', $this->get_buildpath, @_);
+		$this->ensure_minimal_permissions($destdir) if not compat(13);
 	}
 	return 1;
 }
