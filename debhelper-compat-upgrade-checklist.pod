@@ -657,11 +657,6 @@ sequence by default.
 The B<python-distutils> buildsystem is now removed.  Please use the
 third-party build system B<pybuild> instead.
 
-B<Retroactively applied to earlier compat levels>: The build system
-was removed in debhelper/13.21 after the removal of Python2 from
-Debian. The build system stopped working, since it was only applicable
-to Python2 packaging.
-
 =back
 
 =item v11
