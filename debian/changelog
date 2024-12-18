@@ -1,3 +1,15 @@
+debhelper (13.22) unstable; urgency=medium
+
+  * Bring back the python-distutils build-system. It is clearly
+    used given removing it caused 200+ FTBFS bugs. Hoever, it is
+    also clearly not used (becuase using it would cause FTBFS
+    bugs). Instead packages seem to just override all the
+    `dh_auto_*` commands and what breaks with the full removal
+    is that `dh` cannot find the build system.
+    (Reopens: #1089715)
+
+ -- Niels Thykier <niels@thykier.net>  Wed, 18 Dec 2024 07:22:15 +0000
+
 debhelper (13.21) unstable; urgency=medium
 
   [ Niels Thykier ]
