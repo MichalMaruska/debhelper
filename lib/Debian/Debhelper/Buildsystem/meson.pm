@@ -7,7 +7,7 @@ package Debian::Debhelper::Buildsystem::meson;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(compat dpkg_architecture_value is_cross_compiling doit warning error generated_file qx_cmd);
+use Debian::Debhelper::Dh_Lib qw(%dh compat dpkg_architecture_value is_cross_compiling doit warning error generated_file qx_cmd);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 sub DESCRIPTION {
@@ -141,7 +141,11 @@ sub test {
 			if ($this->get_parallel() > 0) {
 				$options{update_env}{MESON_TESTTHREADS} = $this->get_parallel();
 			}
-			$this->doit_in_builddir(\%options, 'meson', 'test', @_);
+			if (!$dh{QUIET}) {
+				$this->doit_in_builddir(\%options, 'meson', 'test', '--verbose', @_);
+			} else {
+				$this->doit_in_builddir(\%options, 'meson', 'test', @_);
+			}
 		}
 	};
 	if (my $err = $@) {
