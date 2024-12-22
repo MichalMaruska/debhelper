@@ -1,3 +1,9 @@
+debhelper (13.22-maruska) unstable; urgency=medium
+
+  * Put GITSHA into control file, as dgit.
+
+ -- Michal Maruska <mmaruska@gmail.com>  Sun, 22 Dec 2024 23:33:24 +0100
+
 debhelper (13.22) unstable; urgency=medium
 
   * Bring back the python-distutils build-system. It is clearly
