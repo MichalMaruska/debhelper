@@ -189,10 +189,11 @@ sub install {
 		$this->{_run_make_as_root} = 1;
 	}
 
-	$this->make_first_existing_target(['install'],
+	my $res = $this->make_first_existing_target(['install'],
 		"DESTDIR=$destdir",
 		"AM_UPDATE_INFO_DIR=no", @_);
-	$this->ensure_minimal_permissions($destdir) if not compat(13);
+	$this->ensure_minimal_permissions($destdir) if not compat(13) and $res;
+	return $res;
 }
 
 sub clean {
