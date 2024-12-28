@@ -1,3 +1,9 @@
+debhelper (13.23-maruska) unstable; urgency=medium
+
+  * Put GITSHA into control file, as dgit.
+
+ -- Michal Maruska <mmaruska@gmail.com>  Sat, 28 Dec 2024 22:19:11 +0100
+
 debhelper (13.23) unstable; urgency=medium
 
   * makefile.pm: Preserve return value from `sub install`
