@@ -1,3 +1,9 @@
+debhelper (13.23) unstable; urgency=medium
+
+  * makefile.pm: Preserve return value from `sub install`
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 28 Dec 2024 11:12:36 +0000
+
 debhelper (13.22) unstable; urgency=medium
 
   * Bring back the python-distutils build-system. It is clearly
