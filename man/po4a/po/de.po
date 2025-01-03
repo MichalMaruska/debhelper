@@ -6,10 +6,10 @@
 # 2024 Christoph Brinkhaus
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 13.20\n"
+"Project-Id-Version: debhelper 13.22\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2024-12-18 08:21+0100\n"
-"PO-Revision-Date: 2024-10-05 16:00+0200\n"
+"PO-Revision-Date: 2024-12-21 11:00+0100\n"
 "Last-Translator: Christoph Brinkhaus <c.brinkhaus@t-online.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -2877,16 +2877,8 @@ msgstr ""
 "Ziele für einen dieser Befehle verwenden, und die Annahmen über die "
 "Reihenfolge der Befehle treffen."
 
-# FIXME does "resultig deb" mean "resulting deb file"?
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:108
-#, fuzzy
-#| msgid ""
-#| "Additionally, B<dh_strip_nondeterminism> and B<dh_compress> plus any "
-#| "commands added by third-party add-ons using these as anchors will no "
-#| "longer be able to rely on the mode/ownership normalization by "
-#| "B<dh_fixperms>, which may expose bugs in the form of incorrect mode or "
-#| "ownership in the resulting deb."
 msgid ""
 "Additionally, B<dh_strip_nondeterminism> and B<dh_compress> plus any "
 "commands added by third-party add-ons using these as anchors will no longer "
@@ -2898,7 +2890,7 @@ msgstr ""
 "alle Erweiterungen von Drittanbietern, die diese Anker verwenden, nicht mehr "
 "auf die »Mode/Ownership«-Normalisierung durch B<dh_fixperms> verlassen, was "
 "zur Offenlegung von Fehlern in der Art von falschen Modi oder Besitzrechten "
-"in der resultierenden »deb«-Datei führen kann."
+"in dem resultierenden Binärpaket führen kann."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:113
@@ -3174,6 +3166,7 @@ msgstr ""
 "Paket, das B<dh_gencontrol> verwendet, nicht von dieser Migration betroffen "
 "ist."
 
+# FIXME systems. will → systems will
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:255
 msgid ""
@@ -3181,6 +3174,10 @@ msgid ""
 "now ensure all paths in the B<destdir> have minimal user permissions "
 "(B<chmod -R u+rwX>) to avoid weird I<permission denied> errors during builds."
 msgstr ""
+"Wenn B<dh_auto_install> ausgeführt wird, stellen die von B<debhelper> "
+"bereitgestellten Bausysteme sicher, dass alle Pfade in B<destdir> "
+"minimale Benutzerberechtigungen haben (B<chmod -R u+rwX>), um "
+"seltsame I<Berechtigung verweigert>-Fehler während des Bauens zu vermeiden."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:259
@@ -3188,6 +3185,8 @@ msgid ""
 "Third-party provided debhelper build systems are recommended to support this "
 "as well.  This can be done by running"
 msgstr ""
+"Drittanbietern von Debhelper-Bausystemen wird empfohlen, dies gleichfalls zu "
+"unterstützen. Das kann mittels der Ausführung von"
 
 #. type: verbatim
 #: debhelper-compat-upgrade-checklist.pod:262
@@ -3196,6 +3195,8 @@ msgid ""
 "     $this->ensure_minimal_permissions($destdir) if not compat(13);\n"
 "\n"
 msgstr ""
+"     $this->ensure_minimal_permissions($destdir) if not compat(13);\n"
+"\n"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:264
@@ -3203,6 +3204,8 @@ msgid ""
 "in the B<debhelper> Buildsystem code from their B<sub install> "
 "implementation after the upstream code has been run."
 msgstr ""
+"im B<debhelper> Bausystem-Code aus deren B<sub install> Implementierung "
+"erreicht werden, und zwar nach der Ausführung des Codes der Originalautoren."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:267
@@ -3211,6 +3214,10 @@ msgid ""
 "denied> errors, you can often solve this by running B<chmod -R u+rwX "
 "DIRECTORY> after running the install target from the upstream build system."
 msgstr ""
+"Falls Sie B<dh_auto_install> nicht verwenden, und Sie seltsame "
+"I<Berechtigung verweigert>-Fehler erhalten, können Sie das oft durch die "
+"Ausführung von B<chmod -R u+rxW VERZEICHNIS> beheben, nachdem Sie das "
+"Installationsziel des Bausystems der Originalautoren ausgeführt haben."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:271
@@ -3220,6 +3227,11 @@ msgid ""
 "\"user write bit\" set. Known cases are B<*.ali> files and B</etc/"
 "sudoers.d>, which B<dh_fixperms> will fix up by default."
 msgstr ""
+"Bitte überprüfen Sie, ob Ihr Paket irgendwelche Spezialfälle aufweist, in "
+"denen Berechtigungen von Dateien oder Verzeichnissen das "
+"»Benutzer-Schreibbit« nicht gesetzt haben dürfen. Bekannte Fälle sind "
+"B<*.ali>-Dateien sowie B</etc/sudoers.d>, die B<dh_fixperms> standardmäßig "
+"berichtigt."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:276
@@ -3230,6 +3242,12 @@ msgid ""
 "B<fakeroot> by default (which papered over some of these issues). This "
 "change is aimed at mitigating the problem."
 msgstr ""
+"Das Problem mit ungewöhnlichen Berechtigungen war in der Theorie schon immer "
+"vorhanden. Dadurch, dass B<dh_fixperms> seit Kompatibilitätsstufe 14 in der "
+"Abfolge später aufgerufen wird, und mit der Änderung, B<fakeroot> "
+"standardmäßig zu entfernen (was einige dieser Probleme verdeckte), ist es "
+"aber deutlich sichtbarer geworden. Diese Änderung soll diese Problematik "
+"eingrenzen."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:283
@@ -3274,18 +3292,8 @@ msgid "In compat 15 (or later), this is changed to an error."
 msgstr ""
 "In Kompatibilitätsstufe 15 (oder neuer) ist das geändert zu einem Fehler."
 
-# FIXME It is now triggers a warning → Now it triggers a warning
-# FIXME In #: debhelper-compat-upgrade-checklist.pod:59
-#       it is an error to use... Is just the context different?
-#       Please clarify.
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:304
-#, fuzzy
-#| msgid ""
-#| "It is now triggers a warning to use a packaging file without the package "
-#| "prefix for B<--name> even if the source package only produces one binary "
-#| "package. As example, if you had a F<debian/bar.service> with the "
-#| "following snippet in F<debian/rules>:"
 msgid ""
 "It now triggers a warning to use a packaging file without the package prefix "
 "for B<--name> even if the source package only produces one binary package. "
@@ -3293,21 +3301,12 @@ msgid ""
 "F<debian/rules>:"
 msgstr ""
 "Jetzt wird eine Warnung ausgelöst, wenn eine Paket-Datei ohne den Paket-"
-"Prefix für B<--name> verwendet wird, selbst wenn das Quellpaket nur ein "
+"Präfix für B<--name> verwendet wird, selbst wenn das Quellpaket nur ein "
 "Binärpaket erzeugt. Falls Sie beispielsweise einen F<debian/bar.service> mit "
 "dem folgenden Schnipsel in F<debian/rules> hatten:"
 
-# FIXME now assumes → now assume
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:317
-#, fuzzy
-#| msgid ""
-#| "The default look up rules for B<Dh_Lib> based tools now assumes that "
-#| "configuration files are no longer named (B<--name>) nor support "
-#| "architecture restrictions by default.  If you work with a third-party "
-#| "debhelper-like tool and need support for either of these features, please "
-#| "file a bug against the tool asking it to declare its configuration file "
-#| "with the relevant options in its B<pkgfile> call."
 msgid ""
 "The default look up rules for B<Dh_Lib> based tools now assume that "
 "configuration files are no longer named (B<--name>) nor support architecture "
@@ -3319,7 +3318,7 @@ msgstr ""
 "Die standardmäßigen Nachschlageregeln für auf B<Dh_Lib> basierende Werkzeuge "
 "nehmen jetzt an, dass Konfigurationsdateien nicht mehr benannt werden (B<--"
 "name>) noch standardmäßig Architektureinschränkungen unterstützen. Falls Sie "
-"mit einem zu Debhelper ähnlichem Werkzeug eines Drittanbieters arbeiten, und "
+"mit einem zu Debhelper ähnlichem Werkzeug eines Drittanbieters arbeiten und "
 "Unterstützung für eine dieser Funktionalitäten benötigen, dann erstellen Sie "
 "bitte bei dem Werkzeug einen Fehlerbericht und bitten, seine "
 "Konfigurationsdatei mit den relevanten Optionen in seinem Aufruf B<pkgfile> "
@@ -3557,14 +3556,8 @@ msgstr ""
 "einfachste Lösung, die Handbuchseite aus F<< debian/I<package>.manpages >> "
 "zu entfernen (davon ausgehend, dass beide Versionen identisch sind)."
 
-# FIXME B<XDG_*> variable → B<XDG_*> variables
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:449
-#, fuzzy
-#| msgid ""
-#| "The B<dh_auto_*> helpers now reset the environment variables B<HOME> and "
-#| "common B<XDG_*> variable.  Please see description of the environment "
-#| "variables in L<debhelper(1)/ENVIRONMENT> for how this is handled."
 msgid ""
 "The B<dh_auto_*> helpers now reset the environment variable B<HOME> and the "
 "common B<XDG_*> variables.  Please see description of the environment "
