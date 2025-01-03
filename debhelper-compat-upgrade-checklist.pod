@@ -252,7 +252,7 @@ will not have to do anything for this migration.
 
 =item -
 
-When running B<dh_auto_install>, B<debhelper> provided build systems. will now ensure
+When running B<dh_auto_install>, B<debhelper> provided build systems will now ensure
 all paths in the B<destdir> have minimal user permissions (B<chmod -R u+rwX>) to avoid
 weird I<permission denied> errors during builds.
 

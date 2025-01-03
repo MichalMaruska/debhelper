@@ -3166,11 +3166,10 @@ msgstr ""
 "Paket, das B<dh_gencontrol> verwendet, nicht von dieser Migration betroffen "
 "ist."
 
-# FIXME systems. will → systems will
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:255
 msgid ""
-"When running B<dh_auto_install>, B<debhelper> provided build systems. will "
+"When running B<dh_auto_install>, B<debhelper> provided build systems will "
 "now ensure all paths in the B<destdir> have minimal user permissions "
 "(B<chmod -R u+rwX>) to avoid weird I<permission denied> errors during builds."
 msgstr ""
