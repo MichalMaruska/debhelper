@@ -107,6 +107,15 @@ each_compat_subtest {
 	my $matches = @foo_postinst ? grep { m{deb-systemd-invoke start .*foo.service} } `cat @foo_postinst` : -1;
 	ok($matches == 1);
 	ok(run_dh_tool('dh_clean'));
+
+
+	# -n flag #1043063
+	ok(run_dh_tool('dh_installsystemd', '-n'));
+	ok(-e 'debian/foo/usr/lib/systemd/system/foo.service');
+	ok(! find_script('foo', 'postinst'));
+	unit_is_enabled('foo', 'foo', 0);
+	unit_is_started('foo', 'foo', 0);
+	ok(run_dh_tool('dh_clean'));
 };
 
 

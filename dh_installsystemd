@@ -75,6 +75,12 @@ currently only used by systemd.
 
 =over 4
 
+=item B<-n>, B<--no-scripts>
+
+Do not modify F<postinst>/F<postrm>/F<prerm> scripts.
+
+Note: This option was silently ignored before debhelper/13.24.
+
 =item B<--no-enable>
 
 Disable the service(s) on purge, but do not enable them on install.
@@ -405,7 +411,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my %options = ('snippet-order' => 'service');
 
-	if (@enable_units) {
+	if (not $dh{NOSCRIPTS} and @enable_units) {
 		for my $unit (@enable_units) {
 			my $snippet = $dh{NO_ENABLE} ? 'postinst-systemd-dont-enable' : 'postinst-systemd-enable';
 			autoscript($package, 'postinst', $snippet, { 'UNITFILE' => $unit }, \%options);
@@ -413,7 +419,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		autoscript($package, 'postrm', 'postrm-systemd', {'UNITFILES' => join(' ', @enable_units) });
 	}
 
-	if (@start_units) {
+	if (not $dh{NOSCRIPTS} and @start_units) {
 		my $replace = { 'UNITFILES' => join(' ', @start_units) };
 
 		if ($dh{RESTART_AFTER_UPGRADE}) {
