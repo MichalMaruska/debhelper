@@ -141,11 +141,12 @@ sub test {
 			if ($this->get_parallel() > 0) {
 				$options{update_env}{MESON_TESTTHREADS} = $this->get_parallel();
 			}
-			if (!$dh{QUIET}) {
-				$this->doit_in_builddir(\%options, 'meson', 'test', '--verbose', @_);
-			} else {
-				$this->doit_in_builddir(\%options, 'meson', 'test', @_);
-			}
+			my @meson_cmd = qw(
+				'meson',
+				'test',
+			);
+			push(@meson_cmd, '--verbose') if not $dh{QUIET};
+			$this->doit_in_builddir(\%options, @meson_cmd, @_);
 		}
 	};
 	if (my $err = $@) {
