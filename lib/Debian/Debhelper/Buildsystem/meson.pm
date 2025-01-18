@@ -141,7 +141,7 @@ sub test {
 			if ($this->get_parallel() > 0) {
 				$options{update_env}{MESON_TESTTHREADS} = $this->get_parallel();
 			}
-			my @meson_cmd = qw(
+			my @meson_cmd = (
 				'meson',
 				'test',
 			);
