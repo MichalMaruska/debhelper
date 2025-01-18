@@ -1,3 +1,25 @@
+debhelper (13.24) unstable; urgency=medium
+
+  [ Xiyue Deng ]
+  * Add CHANGELOG.org as a supported type of changelog (Closes: #1090956)
+  * Update dh_installchangelogs doc regarding support for org mode
+
+  [ Gioele Barabucci ]
+  * autoscripts: Assume DPKG_ROOT is set but possibly empty
+
+  [ Christoph Brinkhaus ]
+  * Update German translation of manpages (Closes: #1091005)
+  * debhelper-compat-upgrade-checklist.pod: Fix typo
+
+  [ Jeremy Bícha ]
+  * meson.pm: pass --verbose to meson test (Closes: #1090846)
+
+  [ Niels Thykier ]
+  * dh_installsystemd: Respect -n/--no-scripts.
+    Thanks to Andreas Metzler <ametzler@bebt.de> (Closes: #1043063)
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 18 Jan 2025 14:39:41 +0000
+
 debhelper (13.23) unstable; urgency=medium
 
   * makefile.pm: Preserve return value from `sub install`
